@@ -42,12 +42,12 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
             file_name="Messy_Leads.csv",
             mime="text/csv"
         )
-        st.markdown("""
+        st.markdown("""f
         1. Click the button above to download our dummy data.
-        2. Go to your computer's Desktop and create a folder called `Python_Practice`.
+        2. Go to your computer's Desktop and create a folder called `Python_Playground`.
         3. Move that `Messy_Leads.csv` file into your new folder.
         4. Open **PyCharm**.
-        5. Right-click the folder name inside PyCharm, select **New > File**, and name it `read.py` (or whatever you like, just end it in `.py`).
+        5. Right-click the folder name inside PyCharm, select **New > File**, and name it `sandbox.py` (or whatever you like, just end it in `.py`).
         """)
 
     with st.expander("Step 2: The Magic Word"):
@@ -73,7 +73,7 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         Type this on line 3, making sure to replace the path with wherever your file actually saved:
 
         ```python
-        df = pd.read_csv(r"C:\Users\YOURNAME\Desktop\Python_Practice\Messy_Leads.csv")
+        df = pd.read_csv(r"C:\Users\YOURNAME\Desktop\Python_Playground\Messy_Leads.csv")
         ```
         """)
 
@@ -95,7 +95,7 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         Add this as your very last line, using the same path you used in Step 3 (but changing the file name at the end):
 
         ```python
-        df.to_csv(r"C:Users\YOURNAME\Desktop\Python_Practice\Clean_Leads_Output.csv", index=False)
+        df.to_csv(r"C:Users\YOURNAME\Desktop\Python_Playground\Clean_Leads_Output.csv", index=False)
         ```
 
         **Run the script one more time.** Now, go open your **Downloads folder** on your computer. Did `Clean_Leads_Output.csv` magically appear? 
@@ -119,8 +119,8 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         import pandas as pd
 
         # 1. SET UP YOUR PATHS AT THE TOP
-        input_file = r"C:\Users\YOURNAME\Desktop\Python_Practice\Messy_Leads.csv"
-        output_file = r"C:\Users\YOURNAME\Desktop\Python_Practice\Clean_Output.csv"
+        input_file = r"C:\Users\YOURNAME\Desktop\Python_Playground\Messy_Leads.csv"
+        output_file = r"C:\Users\YOURNAME\Desktop\Python_Playground\Clean_Output.csv"
 
         # 2. RUN THE COMMANDS USING THE VARIABLES
         df = pd.read_csv(input_file)
