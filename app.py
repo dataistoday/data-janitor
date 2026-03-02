@@ -47,8 +47,7 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         2. Go to your computer's Desktop and create a folder called `Python_Practice`.
         3. Move that `Messy_Leads.csv` file into your new folder.
         4. Open **PyCharm**.
-        5. Click **Open**, find your `Python_Practice` folder, and open it as your project.
-        6. Right-click the folder name inside PyCharm, select **New > File**, and name it `app.py` (or whatever you like, just end it in `.py`).
+        5. Right-click the folder name inside PyCharm, select **New > File**, and name it `read.py` (or whatever you like, just end it in `.py`).
         """)
 
     with st.expander("Step 2: The Magic Word"):
@@ -62,14 +61,19 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         """)
 
     with st.expander("Step 3: The Boss Fight (File Paths)"):
-        st.markdown("""
+        st.markdown(r"""
         Now you have to tell Python exactly where your file lives. 
 
-        Because your Python script and your CSV are sitting in the *exact same folder*, you don't need to type out the massive `C:/Users/...` file path. You can use a **Relative Path**.
+        Since your downloaded data and your Python script are located in different places on your computer, we need to give Python the exact address. This is called an **Absolute Path**.
 
-        Type this on line 3:
+        🚨 **The Windows Trap:** If you copy a file path directly from your computer, it uses backslashes (`\`). Python thinks backslashes are secret codes, which will instantly crash your script! 
+
+        **The Fix:** We put a tiny `r` (for "raw") right before the quotation marks so Python reads it normally.
+
+        Type this on line 3, making sure to replace the path with wherever your file actually saved:
+
         ```python
-        df = pd.read_csv('Messy_Leads.csv')
+        df = pd.read_csv(r"C:\Users\YOURNAME\Desktop\Python_Practice\Messy_Leads.csv")
         ```
         """)
 
@@ -85,14 +89,51 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         """)
 
     with st.expander("Step 5: The Output"):
-        st.markdown("""
-        Finally, let's save a copy of that data right back into the folder as a brand new file. Add this as your very last line:
+        st.markdown(r"""
+        Finally, let's save a copy of your work. We want to save the "Clean" file right back into the same folder where the "Messy" one is sitting. 
+
+        Add this as your very last line, using the same path you used in Step 3 (but changing the file name at the end):
+
         ```python
-        df.to_csv('my_first_output.csv', index=False)
+        df.to_csv(r"C:Users\YOURNAME\Desktop\Python_Practice\Clean_Leads_Output.csv", index=False)
         ```
-        Run the script one more time. Look at your files on the left side of PyCharm—did `my_first_output.csv` magically appear? You are ready to start cleaning in Module 1!
+
+        **Run the script one more time.** Now, go open your **Downloads folder** on your computer. Did `Clean_Leads_Output.csv` magically appear? 
+
+        If you see that new file, you have successfully:
+        1. Imported a library
+        2. Connected to a local file
+        3. Created a brand new file with code
+
+        **You are officially a developer. See you in Module 1!**
         """)
 
+    # THE GRAND FINALE BONUS
+    with st.expander("⭐ BONUS: The Pro Shortcut (Variables)"):
+        st.markdown(r"""
+        Typing long paths twice is a headache. Pro developers define their **Input** and **Output** paths at the very top of the script using **Variables**.
+
+        **Your Goal:** Rewrite your script to look like this. It’s cleaner, faster, and much easier to update.
+
+        ```python
+        import pandas as pd
+
+        # 1. SET UP YOUR PATHS AT THE TOP
+        input_file = r"C:\Users\YOURNAME\Desktop\Python_Practice\Messy_Leads.csv"
+        output_file = r"C:\Users\YOURNAME\Desktop\Python_Practice\Clean_Output.csv"
+
+        # 2. RUN THE COMMANDS USING THE VARIABLES
+        df = pd.read_csv(input_file)
+
+        # (This is where your cleaning code will go later!)
+
+        df.to_csv(output_file, index=False)
+
+        print("Done! Check your folder for the output file.")
+        ```
+
+        **Why do this?** If you move your folder, you only have to change the path **once** at the top instead of hunting through your entire script!
+        """)
 
 # ==========================================
 # MODULE 1: THE DATA JANITOR
