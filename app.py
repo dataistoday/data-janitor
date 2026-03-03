@@ -108,31 +108,45 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         **You are officially a developer. See you in Module 1!**
         """)
 
-    # THE GRAND FINALE BONUS
-    with st.expander("⭐ BONUS: The Pro Shortcut (Variables)"):
+    with st.expander("⭐ BONUS: The Pro Shortcut (Variables & Sneak Peek)"):
         st.markdown(r"""
         Typing long paths twice is a headache. Pro developers define their **Input** and **Output** paths at the very top of the script using **Variables**.
 
-        **Your Goal:** Rewrite your script to look like this. It’s cleaner, faster, and much easier to update.
+        Even better, let's look at exactly where the "Data Janitor" work actually happens! 
+
+        **Your Final Mission:** Rewrite your script to look like this. We are going to add **two lines of cleaning code** right in the middle to fix the messy names (like "jOhN") and the messy emails (like "DAVID@email.com").
 
         ```python
         import pandas as pd
 
-        # 1. SET UP YOUR PATHS AT THE TOP
+        # 1. SET UP YOUR PATHS AT THE TOP (Notice the double backslash!)
         input_file = r"C:\Users\YOURNAME\Desktop\Python_Playground\Messy_Leads.csv"
         output_file = r"C:\Users\YOURNAME\Desktop\Python_Playground\Clean_Output.csv"
 
-        # 2. RUN THE COMMANDS USING THE VARIABLES
+        # 2. OPEN THE FILE
         df = pd.read_csv(input_file)
 
-        # (This is where your cleaning code will go later!)
+        # ----------------------------------------------------
+        # 3. THE CLEANING ZONE (This is what you will learn in Module 1!)
 
+        # Sneak Peek 1: Make all First Names proper Title Case (jOhN -> John)
+        df['First_Name'] = df['First_Name'].str.title()
+
+        # Sneak Peek 2: Force all Emails to be completely lowercase
+        df['Email'] = df['Email'].str.lower()
+        # ----------------------------------------------------
+
+        # 4. SAVE THE FILE AND PRINT THE RESULT
         df.to_csv(output_file, index=False)
-
-        print("Done! Check your folder for the output file.")
+        print("Cleaning Complete! Here is a peek at your new data:")
+        print(df.head())
         ```
 
-        **Why do this?** If you move your folder, you only have to change the path **once** at the top instead of hunting through your entire script!
+
+
+        **Run it one last time!** Look at the terminal output at the bottom of PyCharm. "jOhN" is now "John", and the emails are perfectly uniform. 
+
+        If you successfully ran this script, you have mastered the hardest part of Python: getting it to talk to your computer. **You are ready for Module 1!**
         """)
 
 # ==========================================
