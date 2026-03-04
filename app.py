@@ -36,8 +36,8 @@ if 'current_module' not in st.session_state:
 current_module = st.sidebar.radio(
     "Choose a Module:",
     MODULES,
+    index=MODULES.index(st.session_state.current_module),
     format_func=module_label,
-    key="nav_radio"
 )
 st.session_state.current_module = current_module
 
@@ -94,7 +94,7 @@ def next_module_button(current):
     if current in NEXT_MODULE:
         next_m = NEXT_MODULE[current]
         if st.button(f"→ Continue to {next_m}"):
-            st.session_state.nav_radio = next_m
+            st.session_state.current_module = next_m
             st.rerun()
 
 # ==========================================
