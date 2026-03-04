@@ -10,6 +10,7 @@ if 'completed' not in st.session_state:
 
 MODULES = [
     "🏠 Home",
+    "🛠️ Setup: Before You Begin",
     "Module 0: Ground Zero",
     "Module 1: The Data Janitor",
     "Module 2: The Matchmaker",
@@ -20,7 +21,8 @@ MODULES = [
 ]
 
 NEXT_MODULE = {
-    "🏠 Home": "Module 0: Ground Zero",
+    "🏠 Home": "🛠️ Setup: Before You Begin",
+    "🛠️ Setup: Before You Begin": "Module 0: Ground Zero",
     "Module 0: Ground Zero": "Module 1: The Data Janitor",
     "Module 1: The Data Janitor": "Module 2: The Matchmaker",
     "Module 2: The Matchmaker": "Module 3: The Pivot Table Upgrader",
@@ -249,9 +251,77 @@ if current_module == "🏠 Home":
     st.write("---")
     col_start, _, _ = st.columns([1, 2, 2])
     with col_start:
-        if st.button("🚀 Let's Go → Start Module 0", use_container_width=True):
-            st.session_state.current_module = "Module 0: Ground Zero"
+        if st.button("🚀 Let's Go → Start Setup", use_container_width=True):
+            st.session_state.current_module = "🛠️ Setup: Before You Begin"
             st.rerun()
+
+# ==========================================
+# 🛠️ SETUP: BEFORE YOU BEGIN
+# ==========================================
+elif current_module == "🛠️ Setup: Before You Begin":
+    st.title("🛠️ Before You Begin")
+    st.subheader("Get Python, PyCharm, and Pandas on your computer")
+    st.markdown("This takes about **10–15 minutes** and you only have to do it once. Follow the three steps below in order.")
+    st.write("---")
+
+    with st.expander("Step 1: Install Python", expanded=True):
+        st.markdown("""
+        Python is the engine. We need to install it before anything else.
+
+        1. Go to **[python.org/downloads](https://www.python.org/downloads/)**
+        2. Click the big yellow **"Download Python"** button — it will automatically pick the right version for your computer.
+        3. Run the installer. 
+        
+        🚨 **Critical:** On the very first screen of the installer, check the box that says **"Add Python to PATH"** before you click Install. If you miss this, things will break later.
+        
+        4. Click **Install Now** and let it finish.
+        5. When it's done, you can close the installer.
+        """)
+        st.success("✅ How to know it worked: Open your terminal (search 'Command Prompt' on Windows) and type `python --version`. You should see a version number, not an error.")
+
+    with st.expander("Step 2: Install PyCharm"):
+        st.markdown("""
+        PyCharm is the garage where you'll write and run your Python scripts. We want the free version.
+
+        1. Go to **[jetbrains.com/pycharm/download](https://www.jetbrains.com/pycharm/download/)**
+        2. Scroll down to **PyCharm Community Edition** — that's the free one. Click **Download**.
+        3. Run the installer and click through the defaults — you don't need to change anything.
+        4. Open PyCharm once it's installed.
+        5. On the welcome screen, click **New Project**, give it any name, and click **Create**.
+        """)
+        st.success("✅ How to know it worked: You should see a code editor open with a blank file. That's your workspace!")
+
+    with st.expander("Step 3: Install Pandas & Matplotlib"):
+        st.markdown("""
+        Pandas is the library that lets Python read and work with spreadsheets. Matplotlib makes charts. We install both using a tool called `pip` — it comes bundled with Python automatically.
+
+        1. Inside PyCharm, look at the bottom of the screen and click the **Terminal** tab.
+        2. A command line will open at the bottom. Type this and hit Enter:
+        ```
+        pip install pandas matplotlib
+        ```
+        3. You'll see a bunch of text scroll by. That's normal — it's downloading the libraries.
+        4. Wait for it to finish. It usually takes 30–60 seconds.
+        """)
+        st.success("✅ How to know it worked: The last line should say something like `Successfully installed pandas...`. If you see that, you're done!")
+
+    with st.expander("🆘 Something went wrong?"):
+        st.markdown("""
+        **"Python is not recognized as a command"**  
+        You probably missed the "Add Python to PATH" checkbox during install. Uninstall Python, re-run the installer, and make sure to check that box.
+
+        **PyCharm says "No Python interpreter selected"**  
+        Click the interpreter selector in the bottom-right corner of PyCharm and select the Python version you installed.
+
+        **pip install says "pip is not recognized"**  
+        Try `python -m pip install pandas matplotlib` instead.
+
+        Still stuck? Google the exact error message — Stack Overflow will have the answer. This is a rite of passage for every developer. 😅
+        """)
+
+    st.write("---")
+    st.success("🎉 All three steps done? You're ready to write your first script. Head to Module 0!")
+    next_module_button(current_module)
 
 # ==========================================
 # MODULE 0: GROUND ZERO
