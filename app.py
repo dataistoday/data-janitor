@@ -2,6 +2,41 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 import streamlit.components.v1 as components
+import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime
+
+# ==========================================
+# GOOGLE SHEETS HELPER
+# ==========================================
+def save_feedback_to_sheet(overall, hardest, fave, recommend, comments):
+    try:
+        scopes = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        creds = Credentials.from_service_account_info(
+            st.secrets["gcp_service_account"],
+            scopes=scopes
+        )
+        client = gspread.authorize(creds)
+        sheet = client.open_by_key(st.secrets["feedback_sheet_id"]).sheet1
+
+        if not sheet.get_all_values():
+            sheet.append_row(["Timestamp", "Rating", "Hardest Module", "Favorite Module", "Would Recommend", "Comments"])
+
+        sheet.append_row([
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            overall,
+            hardest,
+            fave,
+            recommend,
+            comments
+        ])
+        return True
+    except Exception as e:
+        return False
+
 
 def inject_ga():
     components.html("""
@@ -1093,6 +1128,7 @@ elif current_module == "📝 Feedback":
 
     st.write("")
     if st.button("Submit Feedback ✅", use_container_width=False):
+        saved = save_feedback_to_sheet(overall, hardest, fave, recommend, comments)
         st.success("🙏 Thank you! Your feedback means a lot and will help make this course better.")
         st.balloons()
         st.markdown(f"""
@@ -1104,3 +1140,5 @@ elif current_module == "📝 Feedback":
         """)
         if comments:
             st.info(f"💬 Your comment: *\"{comments}\"*")
+        if not saved:
+            st.warning("⚠️ Feedback couldn't be saved to the sheet — but thank you anyway!")
