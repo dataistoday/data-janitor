@@ -251,11 +251,12 @@ elif current_module == "Module 1: The Data Janitor":
     st.write("---")
     st.markdown("### The Janitor Challenges")
 
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab_boss = st.tabs([
         "Challenge 1: Text",
         "Challenge 2: Blanks",
         "Challenge 3: Phones",
-        "Challenge 4: Dates"
+        "Challenge 4: Dates",
+        "🏁 Boss Level"
     ])
 
     with tab1:
@@ -316,41 +317,38 @@ df['System_Timestamp'] = pd.to_datetime(df['System_Timestamp'])
 df['System_Timestamp'] = df['System_Timestamp'].dt.strftime('%m/%d/%Y')
             """, language="python")
 
-    st.write("---")
 
-    # ==========================================
-    # THE AUTOMATED GRADER
-    # ==========================================
-    st.subheader("🏁 The Boss Level: Check Your Work")
-    st.info("Upload your final `Clean_Output.csv` here. If you successfully cleaned the emails, you pass!")
+    with tab_boss:
+        st.subheader("🏁 The Boss Level: Check Your Work")
+        st.info("Upload your final `Clean_Output.csv` here. If you successfully cleaned the emails, you pass!")
 
-    uploaded_file = st.file_uploader("Drop Clean_Output.csv here", type="csv")
+        uploaded_file = st.file_uploader("Drop Clean_Output.csv here", type="csv")
 
-    if uploaded_file is not None:
-        try:
-            clean_df = pd.read_csv(uploaded_file)
-            st.write("### The Verdict:")
+        if uploaded_file is not None:
+            try:
+                clean_df = pd.read_csv(uploaded_file)
+                st.write("### The Verdict:")
 
-            missing_emails = clean_df['Email'].isnull().sum()
-            is_lower = (clean_df['Email'].dropna() == clean_df['Email'].dropna().str.lower()).all()
+                missing_emails = clean_df['Email'].isnull().sum()
+                is_lower = (clean_df['Email'].dropna() == clean_df['Email'].dropna().str.lower()).all()
 
-            if missing_emails == 0 and is_lower:
-                st.session_state.completed.add(current_module)
-                st.success("🎉 BOOM! You successfully scrubbed the data!")
-                st.balloons()
-                st.dataframe(clean_df)
-                st.write("---")
-                st.success("✅ **What you just learned:** `.str` methods for text cleaning, `.fillna()` and `.dropna()` for missing data, regex for pattern replacement, and date parsing with `pd.to_datetime()`.")
-                next_module_button(current_module)
-            else:
-                st.error("🚨 Not quite! The 'Email' column still has some issues.")
-                if missing_emails > 0:
-                    st.warning(f"Hint: I still see {missing_emails} completely blank email addresses. Check Challenge 2!")
-                if not is_lower:
-                    st.warning("Hint: Some of the emails still have CAPITAL letters in them. Check Challenge 1!")
+                if missing_emails == 0 and is_lower:
+                    st.session_state.completed.add(current_module)
+                    st.success("🎉 BOOM! You successfully scrubbed the data!")
+                    st.balloons()
+                    st.dataframe(clean_df)
+                    st.write("---")
+                    st.success("✅ **What you just learned:** `.str` methods for text cleaning, `.fillna()` and `.dropna()` for missing data, regex for pattern replacement, and date parsing with `pd.to_datetime()`.")
+                    next_module_button(current_module)
+                else:
+                    st.error("🚨 Not quite! The 'Email' column still has some issues.")
+                    if missing_emails > 0:
+                        st.warning(f"Hint: I still see {missing_emails} completely blank email addresses. Check Challenge 2!")
+                    if not is_lower:
+                        st.warning("Hint: Some of the emails still have CAPITAL letters in them. Check Challenge 1!")
 
-        except Exception as e:
-            st.error("Oops! Something went wrong reading your file. Did you accidentally delete a column name?")
+            except Exception as e:
+                st.error("Oops! Something went wrong reading your file. Did you accidentally delete a column name?")
 
 # ==========================================
 # MODULE 2: THE MATCHMAKER
@@ -402,11 +400,12 @@ charlie.b@email.com,Parkview"""
     st.write("---")
     st.markdown("### The Janitor Challenges: Round 2")
 
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab_boss = st.tabs([
         "Challenge 1: Mapping",
         "Challenge 2: Duplicates",
         "Challenge 3: The Filter",
-        "Challenge 4: Joins (VLOOKUP)"
+        "Challenge 4: Joins (VLOOKUP)",
+        "🏁 Boss Level"
     ])
 
     with tab1:
@@ -465,44 +464,42 @@ roster_df = pd.read_csv(r"C:\\Your\\Path\\Property_Roster.csv")
 df = pd.merge(df, roster_df, on='Email', how='left')
             """, language="python")
 
-    # ==========================================
-    # MODULE 2 GRADER
-    # ==========================================
-    st.write("---")
-    st.subheader("🏁 The Boss Level: Check Your Work")
-    st.info("Upload your final mapped, filtered, and merged CSV here!")
 
-    uploaded_mod2 = st.file_uploader("Drop your Module 2 Output here", type="csv")
-    if uploaded_mod2 is not None:
-        try:
-            mod2_df = pd.read_csv(uploaded_mod2)
-            st.write("### The Verdict:")
+    with tab_boss:
+        st.subheader("🏁 The Boss Level: Check Your Work")
+        st.info("Upload your final mapped, filtered, and merged CSV here!")
 
-            cols_correct = 'First_Name' in mod2_df.columns and 'Email' in mod2_df.columns and 'Assigned_Property' in mod2_df.columns
-            no_dupes = len(mod2_df) <= 3
-            no_tests = True
-            if 'Email' in mod2_df.columns:
-                no_tests = not mod2_df['Email'].str.contains('@fullthrottle.ai', na=False).any()
+        uploaded_mod2 = st.file_uploader("Drop your Module 2 Output here", type="csv")
+        if uploaded_mod2 is not None:
+            try:
+                mod2_df = pd.read_csv(uploaded_mod2)
+                st.write("### The Verdict:")
 
-            if cols_correct and no_dupes and no_tests:
-                st.session_state.completed.add(current_module)
-                st.success("🎉 INCREDIBLE! You mapped, deduplicated, filtered, and joined like a pro!")
-                st.balloons()
-                st.dataframe(mod2_df)
-                st.write("---")
-                st.success("✅ **What you just learned:** `.rename()` to standardize columns, `.drop_duplicates()` to kill dupes, boolean filtering with `~` to remove junk rows, and `pd.merge()` to replace VLOOKUP forever.")
-                next_module_button(current_module)
-            else:
-                st.error("🚨 Not quite! There's still some junk in the trunk.")
-                if not cols_correct:
-                    st.warning("Hint: Check Challenges 1 & 4. I'm missing 'First_Name', 'Email', or 'Assigned_Property'.")
-                if not no_dupes:
-                    st.warning("Hint: Check Challenge 2. I'm still seeing duplicate emails in here!")
-                if not no_tests:
-                    st.warning("Hint: Check Challenge 3. The marketing team's test leads are still showing up!")
+                cols_correct = 'First_Name' in mod2_df.columns and 'Email' in mod2_df.columns and 'Assigned_Property' in mod2_df.columns
+                no_dupes = len(mod2_df) <= 3
+                no_tests = True
+                if 'Email' in mod2_df.columns:
+                    no_tests = not mod2_df['Email'].str.contains('@fullthrottle.ai', na=False).any()
 
-        except Exception as e:
-            st.error("Oops! Something went wrong. Did you save it as a CSV?")
+                if cols_correct and no_dupes and no_tests:
+                    st.session_state.completed.add(current_module)
+                    st.success("🎉 INCREDIBLE! You mapped, deduplicated, filtered, and joined like a pro!")
+                    st.balloons()
+                    st.dataframe(mod2_df)
+                    st.write("---")
+                    st.success("✅ **What you just learned:** `.rename()` to standardize columns, `.drop_duplicates()` to kill dupes, boolean filtering with `~` to remove junk rows, and `pd.merge()` to replace VLOOKUP forever.")
+                    next_module_button(current_module)
+                else:
+                    st.error("🚨 Not quite! There's still some junk in the trunk.")
+                    if not cols_correct:
+                        st.warning("Hint: Check Challenges 1 & 4. I'm missing 'First_Name', 'Email', or 'Assigned_Property'.")
+                    if not no_dupes:
+                        st.warning("Hint: Check Challenge 2. I'm still seeing duplicate emails in here!")
+                    if not no_tests:
+                        st.warning("Hint: Check Challenge 3. The marketing team's test leads are still showing up!")
+
+            except Exception as e:
+                st.error("Oops! Something went wrong. Did you save it as a CSV?")
 
 # ==========================================
 # MODULE 3: THE PIVOT TABLE UPGRADER
@@ -546,7 +543,7 @@ Alice,15,45000,Lakeside,1B1B,1500,1"""
 
     st.write("---")
     st.markdown("### The Janitor Challenges: Round 3")
-    tab1, tab2, tab3 = st.tabs(["Challenge 1: Leaderboard", "Challenge 2: Custom Math", "Challenge 3: Roll-Up"])
+    tab1, tab2, tab3, tab_boss = st.tabs(["Challenge 1: Leaderboard", "Challenge 2: Custom Math", "Challenge 3: Roll-Up", "🏁 Boss Level"])
 
     with tab1:
         st.subheader("Challenge 1: Sales Rep Leaderboard")
@@ -577,36 +574,34 @@ rep_stats['Net_Sales_Per_Appt'] = rep_stats['Total_Sales'] / rep_stats['Appointm
             st.code("rent_roll = df.groupby('Floorplan').agg({'Rent': 'mean', 'Occupied': 'sum'}).reset_index()",
                     language="python")
 
-    # ==========================================
-    # MODULE 3 GRADER
-    # ==========================================
-    st.write("---")
-    st.subheader("🏁 The Boss Level: Check Your Work")
-    st.info("Upload your final leaderboard CSV. It needs the `Net_Sales_Per_Appt` column and should have one row per Sales Rep (3 reps = 3 rows).")
 
-    uploaded_mod3 = st.file_uploader("Drop your Grouped Output here", type="csv")
-    if uploaded_mod3 is not None:
-        try:
-            mod3_df = pd.read_csv(uploaded_mod3)
-            has_col = 'Net_Sales_Per_Appt' in mod3_df.columns
-            right_rows = len(mod3_df) <= 3
+    with tab_boss:
+        st.subheader("🏁 The Boss Level: Check Your Work")
+        st.info("Upload your final leaderboard CSV. It needs the `Net_Sales_Per_Appt` column and should have one row per Sales Rep (3 reps = 3 rows).")
 
-            if has_col and right_rows:
-                st.session_state.completed.add(current_module)
-                st.success("🎉 NAILED IT! You just out-pivoted Excel!")
-                st.balloons()
-                st.dataframe(mod3_df)
-                st.write("---")
-                st.success("✅ **What you just learned:** `.groupby()` for pivot-table-style summaries, grouping multiple columns at once, `.agg()` for mixed math, and creating calculated columns from grouped results.")
-                next_module_button(current_module)
-            else:
-                st.error("🚨 Almost there!")
-                if not has_col:
-                    st.warning("Hint: I don't see a `Net_Sales_Per_Appt` column. Make sure you completed Challenge 2 and saved that column into your output file.")
-                if not right_rows:
-                    st.warning(f"Hint: I'm seeing {len(mod3_df)} rows but expected 3 (one per Sales Rep). Make sure you grouped by `Sales_Rep` before saving.")
-        except Exception as e:
-            st.error("Error reading file. Did you save it as a CSV?")
+        uploaded_mod3 = st.file_uploader("Drop your Grouped Output here", type="csv")
+        if uploaded_mod3 is not None:
+            try:
+                mod3_df = pd.read_csv(uploaded_mod3)
+                has_col = 'Net_Sales_Per_Appt' in mod3_df.columns
+                right_rows = len(mod3_df) <= 3
+
+                if has_col and right_rows:
+                    st.session_state.completed.add(current_module)
+                    st.success("🎉 NAILED IT! You just out-pivoted Excel!")
+                    st.balloons()
+                    st.dataframe(mod3_df)
+                    st.write("---")
+                    st.success("✅ **What you just learned:** `.groupby()` for pivot-table-style summaries, grouping multiple columns at once, `.agg()` for mixed math, and creating calculated columns from grouped results.")
+                    next_module_button(current_module)
+                else:
+                    st.error("🚨 Almost there!")
+                    if not has_col:
+                        st.warning("Hint: I don't see a `Net_Sales_Per_Appt` column. Make sure you completed Challenge 2 and saved that column into your output file.")
+                    if not right_rows:
+                        st.warning(f"Hint: I'm seeing {len(mod3_df)} rows but expected 3 (one per Sales Rep). Make sure you grouped by `Sales_Rep` before saving.")
+            except Exception as e:
+                st.error("Error reading file. Did you save it as a CSV?")
 
 # ==========================================
 # MODULE 4: THE AUTOMATION ENGINE
@@ -643,7 +638,7 @@ Hank,South,60,18,90000"""
                            file_name="South_Region.csv", mime="text/csv")
 
     st.write("---")
-    tab1, tab2, tab3 = st.tabs(["Challenge 1: Monthly Stack", "Challenge 2: Multi-CRM", "Challenge 3: Portfolio Loop"])
+    tab1, tab2, tab3, tab_boss = st.tabs(["Challenge 1: Monthly Stack", "Challenge 2: Multi-CRM", "Challenge 3: Portfolio Loop", "🏁 Boss Level"])
 
     with tab1:
         st.subheader("Challenge 1: The Monthly Roll-Up")
@@ -695,45 +690,43 @@ for file in all_files:
     dataframes_list.append(temp_df)
             """, language="python")
 
-    # ==========================================
-    # MODULE 4 GRADER
-    # ==========================================
-    st.write("---")
-    st.subheader("🏁 The Boss Level: Check Your Work")
-    st.info("Stack both region files and save the combined output as a CSV. It should have all 10 reps and a `Source_File` column. Upload it here!")
 
-    uploaded_mod4 = st.file_uploader("Drop your Stacked Output here", type="csv")
-    if uploaded_mod4 is not None:
-        try:
-            mod4_df = pd.read_csv(uploaded_mod4)
+    with tab_boss:
+        st.subheader("🏁 The Boss Level: Check Your Work")
+        st.info("Stack both region files and save the combined output as a CSV. It should have all 10 reps and a `Source_File` column. Upload it here!")
 
-            has_source = 'Source_File' in mod4_df.columns or 'source_file' in mod4_df.columns
-            enough_rows = len(mod4_df) >= 10
-            has_both_regions = False
-            if has_source:
-                col_name = 'Source_File' if 'Source_File' in mod4_df.columns else 'source_file'
-                sources = mod4_df[col_name].str.lower().unique()
-                has_both_regions = any('north' in s for s in sources) and any('south' in s for s in sources)
+        uploaded_mod4 = st.file_uploader("Drop your Stacked Output here", type="csv")
+        if uploaded_mod4 is not None:
+            try:
+                mod4_df = pd.read_csv(uploaded_mod4)
 
-            if has_source and enough_rows and has_both_regions:
-                st.session_state.completed.add(current_module)
-                st.success("🎉 AUTOMATED! You just processed an entire folder of files in one script!")
-                st.balloons()
-                st.dataframe(mod4_df)
-                st.write("---")
-                st.success("✅ **What you just learned:** `glob` to find files by pattern, `for` loops to process them one by one, `pd.concat()` to stack dataframes, and `os.path.basename()` to track data sources.")
-                next_module_button(current_module)
-            else:
-                st.error("🚨 Not quite!")
-                if not enough_rows:
-                    st.warning(f"Hint: I only see {len(mod4_df)} rows. Both region files together should give you 10 reps. Did you stack both files?")
-                if not has_source:
-                    st.warning("Hint: I don't see a `Source_File` column. Make sure you completed Challenge 3 and added the filename as a column!")
-                if has_source and not has_both_regions:
-                    st.warning("Hint: Looks like only one region made it in. Make sure your glob is picking up both North and South files.")
+                has_source = 'Source_File' in mod4_df.columns or 'source_file' in mod4_df.columns
+                enough_rows = len(mod4_df) >= 10
+                has_both_regions = False
+                if has_source:
+                    col_name = 'Source_File' if 'Source_File' in mod4_df.columns else 'source_file'
+                    sources = mod4_df[col_name].str.lower().unique()
+                    has_both_regions = any('north' in s for s in sources) and any('south' in s for s in sources)
 
-        except Exception as e:
-            st.error("Error reading file. Did you save the combined output as a CSV?")
+                if has_source and enough_rows and has_both_regions:
+                    st.session_state.completed.add(current_module)
+                    st.success("🎉 AUTOMATED! You just processed an entire folder of files in one script!")
+                    st.balloons()
+                    st.dataframe(mod4_df)
+                    st.write("---")
+                    st.success("✅ **What you just learned:** `glob` to find files by pattern, `for` loops to process them one by one, `pd.concat()` to stack dataframes, and `os.path.basename()` to track data sources.")
+                    next_module_button(current_module)
+                else:
+                    st.error("🚨 Not quite!")
+                    if not enough_rows:
+                        st.warning(f"Hint: I only see {len(mod4_df)} rows. Both region files together should give you 10 reps. Did you stack both files?")
+                    if not has_source:
+                        st.warning("Hint: I don't see a `Source_File` column. Make sure you completed Challenge 3 and added the filename as a column!")
+                    if has_source and not has_both_regions:
+                        st.warning("Hint: Looks like only one region made it in. Make sure your glob is picking up both North and South files.")
+
+            except Exception as e:
+                st.error("Error reading file. Did you save the combined output as a CSV?")
 
 # ==========================================
 # MODULE 5: THE PRESENTATION LAYER
@@ -752,7 +745,7 @@ elif current_module == "Module 5: The Presentation Layer":
     )
 
     st.write("---")
-    tab1, tab2, tab3 = st.tabs(["Challenge 1: Trend Tracker", "Challenge 2: Portfolio Bar", "Challenge 3: Status Pie"])
+    tab1, tab2, tab3, tab_boss = st.tabs(["Challenge 1: Trend Tracker", "Challenge 2: Portfolio Bar", "Challenge 3: Status Pie", "🏁 Boss Level"])
 
     with tab1:
         st.subheader("Challenge 1: The Trend Tracker")
@@ -782,21 +775,19 @@ status_counts.plot(kind='pie', autopct='%1.1f%%')
 plt.show()
             """, language="python")
 
-    # ==========================================
-    # MODULE 5 GRADER (THE FRIDGE)
-    # ==========================================
-    st.write("---")
-    st.subheader("🖼️ The Boss Level: The Digital Fridge")
-    st.info(
-        "In PyCharm, click the 'Save' icon on your chart to save it as a .png image. Upload your masterpiece here to complete the course!")
 
-    uploaded_chart = st.file_uploader("Drop your Chart Image (.png or .jpg) here", type=["png", "jpg", "jpeg"])
+    with tab_boss:
+        st.subheader("🖼️ The Boss Level: The Digital Fridge")
+        st.info(
+            "In PyCharm, click the 'Save' icon on your chart to save it as a .png image. Upload your masterpiece here to complete the course!")
 
-    if uploaded_chart is not None:
-        st.session_state.completed.add(current_module)
-        st.success("🎉 GRADUATION COMPLETE! You are officially a Data Janitor!")
-        st.balloons()
-        st.image(uploaded_chart, caption="Your Python Masterpiece, proudly displayed on the digital fridge.")
-        st.write("---")
-        st.success("✅ **What you just learned:** `matplotlib` for chart creation, `.plot()` with `kind=` to switch chart types, and `.value_counts()` to summarize categorical data before plotting.")
-        st.info("🏆 Head back through the sidebar — any modules without a ✅ are still waiting for you!")
+        uploaded_chart = st.file_uploader("Drop your Chart Image (.png or .jpg) here", type=["png", "jpg", "jpeg"])
+
+        if uploaded_chart is not None:
+            st.session_state.completed.add(current_module)
+            st.success("🎉 GRADUATION COMPLETE! You are officially a Data Janitor!")
+            st.balloons()
+            st.image(uploaded_chart, caption="Your Python Masterpiece, proudly displayed on the digital fridge.")
+            st.write("---")
+            st.success("✅ **What you just learned:** `matplotlib` for chart creation, `.plot()` with `kind=` to switch chart types, and `.value_counts()` to summarize categorical data before plotting.")
+            st.info("🏆 Head back through the sidebar — any modules without a ✅ are still waiting for you!")
