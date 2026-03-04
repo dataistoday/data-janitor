@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from io import BytesIO
 
 # ==========================================
 # SESSION STATE INIT
@@ -8,21 +11,32 @@ if 'completed' not in st.session_state:
     st.session_state.completed = set()
 
 MODULES = [
+    "🏠 Home",
     "Module 0: Ground Zero",
     "Module 1: The Data Janitor",
     "Module 2: The Matchmaker",
     "Module 3: The Pivot Table Upgrader",
     "Module 4: The Automation Engine",
-    "Module 5: The Presentation Layer"
+    "Module 5: The Presentation Layer",
+    "📝 Feedback"
 ]
 
 NEXT_MODULE = {
+    "🏠 Home": "Module 0: Ground Zero",
     "Module 0: Ground Zero": "Module 1: The Data Janitor",
     "Module 1: The Data Janitor": "Module 2: The Matchmaker",
     "Module 2: The Matchmaker": "Module 3: The Pivot Table Upgrader",
     "Module 3: The Pivot Table Upgrader": "Module 4: The Automation Engine",
     "Module 4: The Automation Engine": "Module 5: The Presentation Layer",
 }
+
+COMPLETABLE_MODULES = [
+    "Module 1: The Data Janitor",
+    "Module 2: The Matchmaker",
+    "Module 3: The Pivot Table Upgrader",
+    "Module 4: The Automation Engine",
+    "Module 5: The Presentation Layer",
+]
 
 def module_label(m):
     return f"✅ {m}" if m in st.session_state.completed else m
@@ -40,6 +54,13 @@ current_module = st.sidebar.radio(
     format_func=module_label,
 )
 st.session_state.current_module = current_module
+
+# --- Progress Bar ---
+st.sidebar.write("---")
+completed_count = len(st.session_state.completed)
+total_count = len(COMPLETABLE_MODULES)
+st.sidebar.markdown(f"**📊 Progress: {completed_count} of {total_count} modules complete**")
+st.sidebar.progress(completed_count / total_count)
 
 # --- Sidebar Cheat Sheet ---
 st.sidebar.write("---")
@@ -98,9 +119,144 @@ def next_module_button(current):
             st.rerun()
 
 # ==========================================
+# HELPER: CERTIFICATE GENERATOR
+# ==========================================
+def generate_certificate(name):
+    fig, ax = plt.subplots(figsize=(11, 8.5))
+    fig.patch.set_facecolor('#1a1a2e')
+    ax.set_facecolor('#1a1a2e')
+    ax.set_xlim(0, 11)
+    ax.set_ylim(0, 8.5)
+    ax.axis('off')
+
+    # Outer gold border
+    outer = patches.FancyBboxPatch((0.15, 0.15), 10.7, 8.2,
+        boxstyle="round,pad=0.1", linewidth=4,
+        edgecolor='#FFD700', facecolor='none')
+    ax.add_patch(outer)
+
+    # Inner border
+    inner = patches.FancyBboxPatch((0.35, 0.35), 10.3, 7.8,
+        boxstyle="round,pad=0.05", linewidth=1.5,
+        edgecolor='#FFD700', facecolor='none', alpha=0.4)
+    ax.add_patch(inner)
+
+    # Header
+    ax.text(5.5, 7.5, "🧹  Certificate of Completion",
+            ha='center', va='center', fontsize=22, fontweight='bold',
+            color='#FFD700', fontfamily='DejaVu Sans')
+
+    ax.text(5.5, 6.8, "This certifies that",
+            ha='center', va='center', fontsize=14, color='#cccccc',
+            style='italic')
+
+    # Name
+    ax.text(5.5, 5.9, name if name.strip() else "A Proud Data Janitor",
+            ha='center', va='center', fontsize=32, fontweight='bold',
+            color='#ffffff')
+
+    # Divider line
+    ax.plot([1.5, 9.5], [5.35, 5.35], color='#FFD700', linewidth=1, alpha=0.5)
+
+    ax.text(5.5, 4.85, "has successfully completed",
+            ha='center', va='center', fontsize=14, color='#cccccc',
+            style='italic')
+
+    ax.text(5.5, 4.2, "Python for Data Janitors",
+            ha='center', va='center', fontsize=26, fontweight='bold',
+            color='#4fc3f7')
+
+    ax.text(5.5, 3.55,
+            "Mastering data cleaning, automation, and visualization\nusing Python, Pandas, and Matplotlib",
+            ha='center', va='center', fontsize=12, color='#aaaaaa',
+            linespacing=1.8)
+
+    # Module badges
+    badges = ["Ground Zero", "Data Janitor", "Matchmaker", "Pivot Pro", "Automation", "Visualization"]
+    badge_x = [1.0, 2.9, 4.8, 6.2, 8.0, 9.6]
+    for i, (badge, x) in enumerate(zip(badges, badge_x)):
+        circ = patches.Circle((x, 2.4), 0.45, color='#FFD700', alpha=0.15)
+        ax.add_patch(circ)
+        ax.text(x, 2.55, "✅", ha='center', va='center', fontsize=10)
+        ax.text(x, 2.1, badge, ha='center', va='center', fontsize=6.5,
+                color='#aaaaaa')
+
+    # Footer
+    ax.text(5.5, 1.2, "You are officially a Data Janitor. The spreadsheet fears you.",
+            ha='center', va='center', fontsize=11, color='#888888', style='italic')
+
+    ax.text(5.5, 0.65, "python4datajan itors.com",
+            ha='center', va='center', fontsize=9, color='#555555')
+
+    plt.tight_layout(pad=0)
+    buf = BytesIO()
+    plt.savefig(buf, format='png', dpi=150, bbox_inches='tight',
+                facecolor=fig.get_facecolor())
+    buf.seek(0)
+    plt.close()
+    return buf
+
+# ==========================================
+# 🏠 HOME / LANDING PAGE
+# ==========================================
+if current_module == "🏠 Home":
+    st.markdown("""
+    <style>
+    .hero-title { font-size: 3rem; font-weight: 800; margin-bottom: 0; }
+    .hero-sub   { font-size: 1.25rem; color: #888; margin-top: 0.25rem; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<p class="hero-title">🧹 Python for Data Janitors</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-sub">The no-fluff Python course built for people who live in spreadsheets.</p>', unsafe_allow_html=True)
+    st.write("---")
+
+    st.markdown("""
+    ### What is this?
+    This is a hands-on Python course for analysts, ops people, and anyone who has ever spent a Friday afternoon copy-pasting between Excel tabs.
+
+    You won't be building apps or websites. You'll be doing the **real stuff** — cleaning messy CRM exports, stacking monthly files automatically, and turning raw numbers into charts your boss can actually read.
+    """)
+
+    st.write("---")
+    st.markdown("### 📚 What You'll Build")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info("**📍 Module 0: Ground Zero**\nGet Python talking to your files. The hardest part — and you'll nail it first.")
+    with col2:
+        st.info("**🧹 Module 1: The Data Janitor**\nFix broken names, phones, emails, and dates. Automate the cleanup work you do by hand every week.")
+    with col3:
+        st.info("**🧩 Module 2: The Matchmaker**\nRename columns, kill duplicates, filter junk, and replace VLOOKUP forever with a real merge.")
+
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        st.info("**📊 Module 3: Pivot Table Pro**\nGroup, sum, and aggregate data the way Excel Pivot Tables always promised but never delivered.")
+    with col5:
+        st.info("**⚙️ Module 4: The Automation Engine**\nProcess an entire folder of CSV files in one script. No more opening each one by hand.")
+    with col6:
+        st.info("**📈 Module 5: The Presentation Layer**\nTurn your clean data into line charts, bar charts, and pie charts your leadership can read.")
+
+    st.write("---")
+    st.markdown("### 🛠️ What You'll Need")
+    st.markdown("""
+    - **PyCharm** (free) installed on your computer
+    - **Python** installed (PyCharm will walk you through it if not)
+    - A willingness to break things and fix them
+    - No prior experience required
+    """)
+
+    st.write("---")
+    col_start, _, _ = st.columns([1, 2, 2])
+    with col_start:
+        if st.button("🚀 Let's Go → Start Module 0", use_container_width=True):
+            st.session_state.current_module = "Module 0: Ground Zero"
+            st.rerun()
+
+# ==========================================
 # MODULE 0: GROUND ZERO
 # ==========================================
-if current_module == "Module 0: Ground Zero":
+elif current_module == "Module 0: Ground Zero":
     st.title("📍 Ground Zero")
     st.subheader("Module 0: Making Python Talk to Your Files")
     st.info(
@@ -369,9 +525,9 @@ elif current_module == "Module 2: The Matchmaker":
     col1, col2 = st.columns(2)
     with col1:
         module2_data = """Applicant_First,Last_Name,Mail_Address,Phone_Number,System_Timestamp
-Alice,Smith,alice.smith@email.com,555-0100,03/01/2026
+Violet,Smith,Violet.smith@email.com,555-0100,03/01/2026
 Bob,Jones,bjones@email.com,555-0200,03/02/2026
-Alice,Smith,alice.smith@email.com,555-0100,03/03/2026
+Violet,Smith,Violet.smith@email.com,555-0100,03/03/2026
 Test,User,test@python4u.com,555-9999,03/03/2026
 Charlie,Brown,charlie.b@email.com,555-0300,03/04/2026
 QA,Tester,qa.lead@python4u.com,555-8888,03/04/2026
@@ -386,7 +542,7 @@ Bob,Jones,bjones@email.com,555-0200,03/05/2026"""
 
     with col2:
         roster_data = """Email,Assigned_Property
-alice.smith@email.com,Lakeside
+Violet.smith@email.com,Lakeside
 bjones@email.com,Riverside
 charlie.b@email.com,Parkview"""
 
@@ -515,11 +671,11 @@ elif current_module == "Module 3: The Pivot Table Upgrader":
 
     st.write("### 📥 Step 1: Get the Transaction Data")
     module3_data = """Sales_Rep,Appointments,Total_Sales,Property,Floorplan,Rent,Occupied
-Amanda,10,50000,Lakeside,1B1B,1500,1
+Olivia,10,50000,Lakeside,1B1B,1500,1
 Barrett,8,32000,Riverside,2B2B,2000,1
-Amanda,5,20000,Lakeside,2B2B,2200,1
+Olivia,5,20000,Lakeside,2B2B,2200,1
 Barrett,12,60000,Riverside,1B1B,1400,0
-Alice,15,45000,Lakeside,1B1B,1500,1"""
+Violet,15,45000,Lakeside,1B1B,1500,1"""
 
     st.download_button(
         label="📥 Download Transactions.csv",
@@ -616,7 +772,7 @@ elif current_module == "Module 4: The Automation Engine":
     st.write("Download these two files and put them in a new folder called `Monthly_Stack` inside your `Python_Playground` folder.")
 
     north_data = """Rep,Region,Leads,Closed_Deals,Revenue
-Alice,North,45,12,60000
+Violet,North,45,12,60000
 Bob,North,32,8,40000
 Carol,North,28,6,30000
 Dan,North,51,15,75000
@@ -752,6 +908,10 @@ elif current_module == "Module 5: The Presentation Layer":
         st.markdown("**Your Mission:** Generate a line chart showing monthly revenue growth.")
         with st.expander("💡 Need a hint?"):
             st.code("""
+# If you get an ImportError, run: pip install matplotlib
+""")
+        with st.expander("💡 Need a hint?"):
+            st.code("""
 import matplotlib.pyplot as plt
 
 df.plot(kind='line', x='Month', y='Revenue', title="Monthly Revenue")
@@ -775,12 +935,13 @@ status_counts.plot(kind='pie', autopct='%1.1f%%')
 plt.show()
             """, language="python")
 
-
     with tab_boss:
         st.subheader("🖼️ The Boss Level: The Digital Fridge")
         st.info(
-            "In PyCharm, click the 'Save' icon on your chart to save it as a .png image. Upload your masterpiece here to complete the course!")
-
+            "In your script, use `plt.savefig()` to save your chart directly to your Python_Playground folder on your Desktop:\n\n"
+            "`plt.savefig(r'C:/Users/YourName/Desktop/Python_Playground/my_chart.png')`\n\n"
+            "Then upload your masterpiece here to complete the course!"
+        )
         uploaded_chart = st.file_uploader("Drop your Chart Image (.png or .jpg) here", type=["png", "jpg", "jpeg"])
 
         if uploaded_chart is not None:
@@ -790,4 +951,71 @@ plt.show()
             st.image(uploaded_chart, caption="Your Python Masterpiece, proudly displayed on the digital fridge.")
             st.write("---")
             st.success("✅ **What you just learned:** `matplotlib` for chart creation, `.plot()` with `kind=` to switch chart types, and `.value_counts()` to summarize categorical data before plotting.")
+
+            # ---- CERTIFICATE ----
+            st.write("---")
+            st.subheader("🎓 Claim Your Certificate")
+            grad_name = st.text_input("Enter your name for the certificate:", placeholder="e.g. Amanda Salvador")
+            if grad_name:
+                cert_buf = generate_certificate(grad_name)
+                st.image(cert_buf, caption="Right-click the image to save it!")
+                st.download_button(
+                    label="📥 Download Certificate",
+                    data=cert_buf,
+                    file_name="DataJanitor_Certificate.png",
+                    mime="image/png"
+                )
             st.info("🏆 Head back through the sidebar — any modules without a ✅ are still waiting for you!")
+
+# ==========================================
+# 📝 FEEDBACK
+# ==========================================
+elif current_module == "📝 Feedback":
+    st.title("📝 Course Feedback")
+    st.markdown("Thank you for taking the course! Your feedback helps make it better for the next person.")
+    st.write("---")
+
+    overall = st.select_slider(
+        "Overall, how would you rate the course?",
+        options=["⭐ Poor", "⭐⭐ Fair", "⭐⭐⭐ Good", "⭐⭐⭐⭐ Great", "⭐⭐⭐⭐⭐ Excellent"],
+        value="⭐⭐⭐⭐ Great"
+    )
+
+    hardest = st.selectbox(
+        "Which module was the hardest?",
+        ["Module 0: Ground Zero", "Module 1: The Data Janitor", "Module 2: The Matchmaker",
+         "Module 3: The Pivot Table Upgrader", "Module 4: The Automation Engine",
+         "Module 5: The Presentation Layer", "They were all equally brutal 😅"]
+    )
+
+    fave = st.selectbox(
+        "Which module was your favorite?",
+        ["Module 0: Ground Zero", "Module 1: The Data Janitor", "Module 2: The Matchmaker",
+         "Module 3: The Pivot Table Upgrader", "Module 4: The Automation Engine",
+         "Module 5: The Presentation Layer"]
+    )
+
+    comments = st.text_area(
+        "Any other thoughts? What was confusing? What did you love?",
+        placeholder="Write anything here...",
+        height=150
+    )
+
+    recommend = st.radio(
+        "Would you recommend this course to a coworker?",
+        ["Yes, absolutely!", "Maybe", "Probably not"]
+    )
+
+    st.write("")
+    if st.button("Submit Feedback ✅", use_container_width=False):
+        st.success("🙏 Thank you! Your feedback means a lot and will help make this course better.")
+        st.balloons()
+        st.markdown(f"""
+        **Here's what you submitted:**
+        - Rating: {overall}
+        - Hardest module: {hardest}
+        - Favorite module: {fave}
+        - Would recommend: {recommend}
+        """)
+        if comments:
+            st.info(f"💬 Your comment: *\"{comments}\"*")
