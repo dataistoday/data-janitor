@@ -1,7 +1,22 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
+import streamlit.components.v1 as components
 
+def inject_ga():
+    components.html("""
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-C5LSF3VNRX"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        
+          gtag('config', 'G-C5LSF3VNRX');
+        </script>
+    """, height=0)
+
+inject_ga()
 # ==========================================
 # SESSION STATE INIT
 # ==========================================
