@@ -116,7 +116,7 @@ if current_module == "Module 0: Ground Zero":
         messy_data = """First_Name,Last_Name,Email,Phone_Number,System_Timestamp
 jOhN,Smith,john.smith@email.com ,(555) 123-4567,2026-02-28T14:30:00.000Z
 MARY  ,Johnson,,555.987.6543,2026-01-15T09:15:00.000Z
-david,  Williams,DAVID@email.com,,2025-12-01T18:45:00.000Z
+barrett,  Williams,Barrett@email.com,,2025-12-01T18:45:00.000Z
 sara,Jones , sara.j@email.com ,+1 555 555 5555,2026-03-01T08:00:00.000Z
 MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
 
@@ -198,7 +198,7 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
 
         Even better, let's look at exactly where the "Data Janitor" work actually happens! 
 
-        **Your Final Mission:** Rewrite your script to look like this. We are going to add **two lines of cleaning code** right in the middle to fix the messy names (like "jOhN") and the messy emails (like "DAVID@email.com").
+        **Your Final Mission:** Rewrite your script to look like this. We are going to add **two lines of cleaning code** right in the middle to fix the messy names (like "jOhN") and the messy emails (like "BARRETT@email.com").
 
         ```python
         import pandas as pd
@@ -446,7 +446,7 @@ df = df.drop_duplicates(subset=['Email'], keep='first')
             st.write("The `~` symbol in Python means 'NOT'. We are telling Pandas: Keep the rows where the email does NOT contain our company domain.")
             st.code("""
 # The ~ symbol flips the search to find the opposite!
-df = df[~df['Email'].str.contains('@python4u.com', na=False)
+df = df[~df['Email'].str.contains('@python4u.com', na=False)]
             """, language="python")
 
     with tab4:
@@ -455,7 +455,7 @@ df = df[~df['Email'].str.contains('@python4u.com', na=False)
         **Your Mission:** Load `Property_Roster.csv` as a second dataframe and merge it into your main data so every lead has an `Assigned_Property` attached to them based on their email.
         """)
         with st.expander("💡 Need a hint?"):
-            st.write("In Python, we don't VLOOKUP. We Merge. It's infinitely faster and won't crash your computer.")
+            st.write("In Python, we don't VLOOKUP. We Merge. It's infinitely faster and won't crash your computer. ***Bonus-*** Challenge yourself to make a variable at the top of your script, like df2=")
             st.code("""
 # 1. Load the second file
 roster_df = pd.read_csv(r"C:\\Your\\Path\\Property_Roster.csv")
@@ -516,9 +516,9 @@ elif current_module == "Module 3: The Pivot Table Upgrader":
     st.write("### 📥 Step 1: Get the Transaction Data")
     module3_data = """Sales_Rep,Appointments,Total_Sales,Property,Floorplan,Rent,Occupied
 Amanda,10,50000,Lakeside,1B1B,1500,1
-David,8,32000,Riverside,2B2B,2000,1
+Barrett,8,32000,Riverside,2B2B,2000,1
 Amanda,5,20000,Lakeside,2B2B,2200,1
-David,12,60000,Riverside,1B1B,1400,0
+Barrett,12,60000,Riverside,1B1B,1400,0
 Alice,15,45000,Lakeside,1B1B,1500,1"""
 
     st.download_button(
