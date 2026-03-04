@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 from io import BytesIO
 
 # ==========================================
@@ -122,6 +120,8 @@ def next_module_button(current):
 # HELPER: CERTIFICATE GENERATOR
 # ==========================================
 def generate_certificate(name):
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
     fig, ax = plt.subplots(figsize=(11, 8.5))
     fig.patch.set_facecolor('#1a1a2e')
     ax.set_facecolor('#1a1a2e')
