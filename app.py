@@ -372,9 +372,9 @@ elif current_module == "Module 2: The Matchmaker":
 Alice,Smith,alice.smith@email.com,555-0100,03/01/2026
 Bob,Jones,bjones@email.com,555-0200,03/02/2026
 Alice,Smith,alice.smith@email.com,555-0100,03/03/2026
-Test,User,test@fullthrottle.ai,555-9999,03/03/2026
+Test,User,test@python4u.com,555-9999,03/03/2026
 Charlie,Brown,charlie.b@email.com,555-0300,03/04/2026
-QA,Tester,qa.lead@fullthrottle.ai,555-8888,03/04/2026
+QA,Tester,qa.lead@python4u.com,555-8888,03/04/2026
 Bob,Jones,bjones@email.com,555-0200,03/05/2026"""
 
         st.download_button(
@@ -440,13 +440,13 @@ df = df.drop_duplicates(subset=['Email'], keep='first')
         st.subheader("Challenge 3: The Internal Filter")
         st.markdown("""
         **Your Mission:** Our marketing team keeps submitting "test" leads. 
-        Find any row where the `Email` contains `@fullthrottle.ai` and completely remove it from the dataset.
+        Find any row where the `Email` contains `@python4u.com` and completely remove it from the dataset.
         """)
         with st.expander("💡 Need a hint?"):
             st.write("The `~` symbol in Python means 'NOT'. We are telling Pandas: Keep the rows where the email does NOT contain our company domain.")
             st.code("""
 # The ~ symbol flips the search to find the opposite!
-df = df[~df['Email'].str.contains('@fullthrottle.ai', na=False)]
+df = df[~df['Email'].str.contains('@python4u.com', na=False)
             """, language="python")
 
     with tab4:
@@ -479,7 +479,7 @@ df = pd.merge(df, roster_df, on='Email', how='left')
                 no_dupes = len(mod2_df) <= 3
                 no_tests = True
                 if 'Email' in mod2_df.columns:
-                    no_tests = not mod2_df['Email'].str.contains('@fullthrottle.ai', na=False).any()
+                    no_tests = not mod2_df['Email'].str.contains('@python4u.com', na=False).any()
 
                 if cols_correct and no_dupes and no_tests:
                     st.session_state.completed.add(current_module)
