@@ -1075,7 +1075,7 @@ plt.show()
             # ---- CERTIFICATE ----
             st.write("---")
             st.subheader("🎓 Claim Your Certificate")
-            grad_name = st.text_input("Enter your name for the certificate:", placeholder="e.g. Amanda Salvador")
+            grad_name = st.text_input("Enter your name for the certificate:", placeholder="e.g. John Cena")
             if grad_name:
                 cert_buf = generate_certificate(grad_name)
                 st.image(cert_buf, caption="Right-click the image to save it!")
