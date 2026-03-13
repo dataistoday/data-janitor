@@ -87,12 +87,12 @@ NEXT_MODULE = {
     "Module 3: The Pivot Table Upgrader": "Module 4: The Automation Engine",
     "Module 4: The Automation Engine": "Module 5: The Presentation Layer",
     "Module 5: The Presentation Layer": "🎓 Phase 1 Graduation",
-    "🎓 Phase 1 Graduation": "--- PHASE 2: THE ARCHITECT ---",
+    "🎓 Phase 1 Graduation": "📝 Feedback",
+    "📝 Feedback": "--- PHASE 2: THE ARCHITECT ---",
     "--- PHASE 2: THE ARCHITECT ---": "Module 6: The Blueprint",
     "Module 6: The Blueprint": "Module 7: The Time Machine",
     "Module 7: The Time Machine": "Module 8: The SQL Surgeon",
-    "Module 8: The SQL Surgeon": "Module 9: The Output Architect",
-    "Module 9: The Output Architect": "📝 Feedback"
+    "Module 8: The SQL Surgeon": "Module 9: The Output Architect"
 }
 
 COMPLETABLE_MODULES = [
@@ -130,13 +130,13 @@ current_module = st.sidebar.radio(
         "Module 3: The Pivot Table Upgrader",
         "Module 4: The Automation Engine",
         "Module 5: The Presentation Layer",
-        "🎓 Phase 1 Graduation",          # <--- ADDED HERE
+        "🎓 Phase 1 Graduation",
+        "📝 Feedback",
         "--- PHASE 2: THE ARCHITECT ---",
         "Module 6: The Blueprint",
         "Module 7: The Time Machine",
         "Module 8: The SQL Surgeon",
-        "Module 9: The Output Architect",
-        "📝 Feedback"
+        "Module 9: The Output Architect"
     ],
     format_func=format_menu_item
 )
@@ -1241,6 +1241,7 @@ elif current_module == "🎓 Phase 1 Graduation":
 # ==========================================
 # PHASE 2 LANDING PAGE
 # ==========================================
+
 elif current_module == "--- PHASE 2: THE ARCHITECT ---":
     st.title("🏗️ Phase 2: The Architect")
     st.subheader("From Writing Scripts to Building Systems")
@@ -1248,9 +1249,9 @@ elif current_module == "--- PHASE 2: THE ARCHITECT ---":
     st.markdown("""
     You have mastered the broom. Now it is time to build. 
 
-    In the real world, developers rarely write code from scratch. 90% of the job is taking an existing, complex production script and rewiring it for a new business need. 
+    In the real world, developers rarely write code from scratch. **SharePoint connections, APIs, and custom functions can be incredibly challenging to set up.** That is part of the reason it is almost always easier to take an old script that already has the hard parts figured out, strip it down, and modify it for your new needs.
 
-    In this phase, we are going to dismantle the `sp_lookbacks.py` script piece by piece, and repurpose it to build a brand new Journey Suppression tool.
+    In this phase, we are going to take an existing production script and repurpose it to build a brand new Journey Suppression tool.
 
     ### Your Curriculum:
     * **Module 6: The Blueprint** - Changing where a script looks for its input files.
@@ -1261,8 +1262,6 @@ elif current_module == "--- PHASE 2: THE ARCHITECT ---":
     🚨 **Note:** Phase 2 is locked! 
     👈 **Click Module 6 in the sidebar and enter the master password to unlock this phase.**
     """)
-
-
 # ==========================================
 # MODULE 6: THE BLUEPRINT
 # ==========================================
@@ -1270,7 +1269,7 @@ elif current_module == "Module 6: The Blueprint":
     st.title("🏗️ The Blueprint")
     st.subheader("Phase 2 | Module 6: Rewiring the Inputs")
     st.markdown("""
-    Welcome to Phase 2. You are no longer just writing scripts from scratch; you are taking a massive, 300-line production script (`sp_lookbacks.py`) and stripping it down to build something new. 
+    Welcome to Phase 2. You are taking a massive, 300-line production script (`sp_lookbacks.py`) and stripping it down to build something new. 
 
     The first step in rewiring a script is changing where it looks for instructions.
     """)
@@ -1278,9 +1277,11 @@ elif current_module == "Module 6: The Blueprint":
 
     st.subheader("Challenge: The SharePoint Reroute")
     st.markdown("""
-    **The Scenario:** The old script looks for a template file in `Data Analytics/Shopper Suite/Lookbacks/Templates`. Your new script needs to look in `Data Governance/Suppression/By Journey/Templates`.
+    **The Scenario:** The old script looks for a template file in `Data Analytics/Shopper Suite/Lookbacks/Templates`. 
 
-    Furthermore, our new CSV template is much simpler. We only need to pull 5 specific columns from it to power our script.
+    Before writing any code, go to SharePoint and physically build this new folder path: `Data Governance/Suppression/By Journey/Templates`. Then, upload your new, simpler CSV template there.
+
+    Our new CSV template is much simpler. We only need to pull 5 specific columns from it to power our script.
     """)
 
     with st.expander("💡 See how to strip it down"):
@@ -1303,6 +1304,8 @@ segment = str(row.get('segment', '')).strip()
     if st.button("✅ I understand how to change inputs"):
         st.session_state['mod6_passed'] = True
         st.session_state.completed.add(current_module)
+        st.balloons()  # <-- Celebration added!
+        st.success("🎉 Blueprint Secured! Great job.")
         next_module_button(current_module)
 
 # ==========================================
@@ -1353,6 +1356,8 @@ print(f"Running data from {start_date} to {end_date}")
     if st.button("✅ I've mastered time travel"):
         st.session_state['mod7_passed'] = True
         st.session_state.completed.add(current_module)
+        st.balloons()  # <-- Celebration added!
+        st.success("🎉 Time Machine activated! Next stop: SQL.")
         next_module_button(current_module)
 
 # ==========================================
@@ -1397,6 +1402,8 @@ df_raw = sfc(sql_query)
     if st.button("✅ I understand SQL injection"):
         st.session_state['mod8_passed'] = True
         st.session_state.completed.add(current_module)
+        st.balloons()  # <-- Celebration added!
+        st.success("🎉 Surgery complete! The variables are in.")
         next_module_button(current_module)
 
 # ==========================================
@@ -1408,23 +1415,23 @@ elif current_module == "Module 9: The Output Architect":
     st.markdown("""
     You've pulled the data. Now we need to save it exactly the way the business asked for it. 
 
-    The requirement is strict: Every output file must follow the exact naming convention: `ohq__generic__services__yymmdd.csv`.
+    The requirement is strict: Every output file must follow the exact naming convention: `ohq__generic__sales__{firstdayofthemonth}.csv`.
     """)
     st.write("---")
 
     st.markdown("### Constructing the Filename")
     st.write(
-        "We will use our dynamic date tool from Module 7 to format today's date into the weird `yymmdd` format (like 260312), and use an f-string to piece it all together.")
+        "We will use our dynamic date tool from Module 7 to figure out the 1st of the current month, format it as `yymmdd`, and use an f-string to piece it all together.")
 
     st.code("""
 from datetime import date
 
-# 1. Format today's date as just YearMonthDay (e.g., 260312)
-yymmdd = date.today().strftime('%y%m%d')
+# 1. Grab the 1st of the current month and format it as YYMMDD (e.g., 260301)
+first_day_of_month = date.today().replace(day=1).strftime('%y%m%d')
 
 # 2. Build the filename using the OHQ variable we grabbed in Module 6
-# It will look like: 12345__generic__services__260312.csv
-final_filename = f"{ohq}__generic__services__{yymmdd}.csv"
+# It will look like: 12345__generic__sales__260301.csv
+final_filename = f"{ohq}__generic__sales__{first_day_of_month}.csv"
 
 # 3. Save the dataframe to that file
 df_raw.to_csv(final_filename, index=False)
@@ -1435,11 +1442,36 @@ print(f"Successfully saved: {final_filename}")
     st.info(
         "Check this off to complete Phase 2. You now have all the puzzle pieces to strip down the Lookbacks script and build the new Journey Suppression script!")
 
-    if st.button("✅ I am officially a Script Architect"):
+    if st.button("✅ I am officially a Script Architect", use_container_width=True):
         st.session_state['mod9_passed'] = True
         st.session_state.completed.add(current_module)
         st.balloons()
-        st.success("🎉 You've completed Phase 2! Head to the Feedback tab to let us know how it went.")
+
+        # THE BIG PHASE 2 PAYOFF REVEAL
+        st.write("---")
+        st.markdown("""
+        <h1 style='text-align: center; color: #4fc3f7; font-size: 3em;'>🏗️ SYSTEM ONLINE 🏗️</h1>
+        <h3 style='text-align: center; color: #aaaaaa;'>You are officially a Data Architect.</h3>
+        <br>
+        """, unsafe_allow_html=True)
+
+        st.success(
+            "🎉 **PHASE 2 COMPLETE!** You have successfully learned how to dismantle a production script and rewire it into a brand new automation tool.")
+
+        # Displaying their new "Architect Stats"
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Folder Inputs", "Rewired 🔌")
+        col2.metric("Date Logic", "Automated ⏳")
+        col3.metric("SQL Queries", "Injected 💉")
+        col4.metric("File Outputs", "Dynamic 📦")
+
+        st.write("---")
+        st.markdown("""
+        ### 🚀 Your Final Mission
+        You no longer just clean data. You build the systems that process it. 
+
+        Your training is complete. Open up PyCharm, make a copy of the old `sp_lookbacks.py` script, and start building the real **Journey Suppression** tool for the business!
+        """)
 
 # ==========================================
 # 📝 FEEDBACK
