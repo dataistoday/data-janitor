@@ -6,6 +6,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
 
+
 # ==========================================
 # GOOGLE SHEETS HELPER
 # ==========================================
@@ -23,7 +24,8 @@ def save_feedback_to_sheet(overall, hardest, fave, recommend, comments):
         sheet = client.open_by_key(st.secrets["feedback_sheet_id"]).sheet1
 
         if not sheet.get_all_values():
-            sheet.append_row(["Timestamp", "Rating", "Hardest Module", "Favorite Module", "Would Recommend", "Comments"])
+            sheet.append_row(
+                ["Timestamp", "Rating", "Hardest Module", "Favorite Module", "Would Recommend", "Comments"])
 
         sheet.append_row([
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -40,68 +42,103 @@ def save_feedback_to_sheet(overall, hardest, fave, recommend, comments):
 
 def inject_ga():
     components.html("""
-        <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-C5LSF3VNRX"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-        
+
           gtag('config', 'G-C5LSF3VNRX');
         </script>
     """, height=0)
 
+
 inject_ga()
+
 # ==========================================
-# SESSION STATE INIT
+# SESSION STATE INIT & NAVIGATION
 # ==========================================
 if 'completed' not in st.session_state:
     st.session_state.completed = set()
 
-MODULES = [
-    "🏠 Home",
-    "🛠️ Setup: Before You Begin",
-    "Module 0: Ground Zero",
-    "Module 1: The Data Janitor",
-    "Module 2: The Matchmaker",
-    "Module 3: The Pivot Table Upgrader",
-    "Module 4: The Automation Engine",
-    "Module 5: The Presentation Layer",
-    "📝 Feedback"
-]
+# Add the Phase 1 & 2 modules to the tracking lists
+if 'mod1_passed' not in st.session_state: st.session_state['mod1_passed'] = False
+if 'mod2_passed' not in st.session_state: st.session_state['mod2_passed'] = False
+if 'mod3_passed' not in st.session_state: st.session_state['mod3_passed'] = False
+if 'mod4_passed' not in st.session_state: st.session_state['mod4_passed'] = False
+if 'mod5_passed' not in st.session_state: st.session_state['mod5_passed'] = False
+
+if 'mod6_passed' not in st.session_state: st.session_state['mod6_passed'] = False
+if 'mod7_passed' not in st.session_state: st.session_state['mod7_passed'] = False
+if 'mod8_passed' not in st.session_state: st.session_state['mod8_passed'] = False
+if 'mod9_passed' not in st.session_state: st.session_state['mod9_passed'] = False
+
+# The Phase 2 Master Lock
+if 'phase2_unlocked' not in st.session_state:
+    st.session_state['phase2_unlocked'] = False
 
 NEXT_MODULE = {
     "🏠 Home": "🛠️ Setup: Before You Begin",
-    "🛠️ Setup: Before You Begin": "Module 0: Ground Zero",
+    "🛠️ Setup: Before You Begin": "--- PHASE 1: THE BASICS ---",
+    "--- PHASE 1: THE BASICS ---": "Module 0: Ground Zero",
     "Module 0: Ground Zero": "Module 1: The Data Janitor",
     "Module 1: The Data Janitor": "Module 2: The Matchmaker",
     "Module 2: The Matchmaker": "Module 3: The Pivot Table Upgrader",
     "Module 3: The Pivot Table Upgrader": "Module 4: The Automation Engine",
     "Module 4: The Automation Engine": "Module 5: The Presentation Layer",
+    "Module 5: The Presentation Layer": "🎓 Phase 1 Graduation",
+    "🎓 Phase 1 Graduation": "--- PHASE 2: THE ARCHITECT ---",
+    "--- PHASE 2: THE ARCHITECT ---": "Module 6: The Blueprint",
+    "Module 6: The Blueprint": "Module 7: The Time Machine",
+    "Module 7: The Time Machine": "Module 8: The SQL Surgeon",
+    "Module 8: The SQL Surgeon": "Module 9: The Output Architect",
+    "Module 9: The Output Architect": "📝 Feedback"
 }
 
 COMPLETABLE_MODULES = [
-    "Module 1: The Data Janitor",
-    "Module 2: The Matchmaker",
-    "Module 3: The Pivot Table Upgrader",
-    "Module 4: The Automation Engine",
-    "Module 5: The Presentation Layer",
+    "Module 1: The Data Janitor", "Module 2: The Matchmaker", "Module 3: The Pivot Table Upgrader",
+    "Module 4: The Automation Engine", "Module 5: The Presentation Layer",
+    "Module 6: The Blueprint", "Module 7: The Time Machine", "Module 8: The SQL Surgeon",
+    "Module 9: The Output Architect"
 ]
 
-def module_label(m):
-    return f"✅ {m}" if m in st.session_state.completed else m
 
-# --- Sidebar Navigation ---
-st.sidebar.title("🧹 Menu")
+# Function to dynamically add checkmarks to the menu
+def format_menu_item(module_name):
+    if module_name == "Module 1: The Data Janitor" and st.session_state['mod1_passed']: return f"✅ {module_name}"
+    if module_name == "Module 2: The Matchmaker" and st.session_state['mod2_passed']: return f"✅ {module_name}"
+    if module_name == "Module 3: The Pivot Table Upgrader" and st.session_state[
+        'mod3_passed']: return f"✅ {module_name}"
+    if module_name == "Module 4: The Automation Engine" and st.session_state['mod4_passed']: return f"✅ {module_name}"
+    if module_name == "Module 5: The Presentation Layer" and st.session_state['mod5_passed']: return f"✅ {module_name}"
+    if module_name == "Module 6: The Blueprint" and st.session_state['mod6_passed']: return f"✅ {module_name}"
+    if module_name == "Module 7: The Time Machine" and st.session_state['mod7_passed']: return f"✅ {module_name}"
+    if module_name == "Module 8: The SQL Surgeon" and st.session_state['mod8_passed']: return f"✅ {module_name}"
+    if module_name == "Module 9: The Output Architect" and st.session_state['mod9_passed']: return f"✅ {module_name}"
+    return module_name
 
-if 'current_module' not in st.session_state:
-    st.session_state.current_module = MODULES[0]
 
 current_module = st.sidebar.radio(
     "Choose a Module:",
-    MODULES,
-    index=MODULES.index(st.session_state.current_module),
-    format_func=module_label,
+    [
+        "🏠 Home",
+        "🛠️ Setup: Before You Begin",
+        "--- PHASE 1: THE BASICS ---",
+        "Module 0: Ground Zero",
+        "Module 1: The Data Janitor",
+        "Module 2: The Matchmaker",
+        "Module 3: The Pivot Table Upgrader",
+        "Module 4: The Automation Engine",
+        "Module 5: The Presentation Layer",
+        "🎓 Phase 1 Graduation",          # <--- ADDED HERE
+        "--- PHASE 2: THE ARCHITECT ---",
+        "Module 6: The Blueprint",
+        "Module 7: The Time Machine",
+        "Module 8: The SQL Surgeon",
+        "Module 9: The Output Architect",
+        "📝 Feedback"
+    ],
+    format_func=format_menu_item
 )
 st.session_state.current_module = current_module
 
@@ -158,6 +195,7 @@ with st.sidebar.expander("📋 Cheat Sheet"):
     - `plt.show()` — pop open the chart window
     """)
 
+
 # ==========================================
 # HELPER: NEXT MODULE BUTTON
 # ==========================================
@@ -167,6 +205,7 @@ def next_module_button(current):
         if st.button(f"→ Continue to {next_m}"):
             st.session_state.current_module = next_m
             st.rerun()
+
 
 # ==========================================
 # HELPER: CERTIFICATE GENERATOR
@@ -181,19 +220,16 @@ def generate_certificate(name):
     ax.set_ylim(0, 8.5)
     ax.axis('off')
 
-    # Outer gold border
     outer = patches.FancyBboxPatch((0.15, 0.15), 10.7, 8.2,
-        boxstyle="round,pad=0.1", linewidth=4,
-        edgecolor='#FFD700', facecolor='none')
+                                   boxstyle="round,pad=0.1", linewidth=4,
+                                   edgecolor='#FFD700', facecolor='none')
     ax.add_patch(outer)
 
-    # Inner border
     inner = patches.FancyBboxPatch((0.35, 0.35), 10.3, 7.8,
-        boxstyle="round,pad=0.05", linewidth=1.5,
-        edgecolor='#FFD700', facecolor='none', alpha=0.4)
+                                   boxstyle="round,pad=0.05", linewidth=1.5,
+                                   edgecolor='#FFD700', facecolor='none', alpha=0.4)
     ax.add_patch(inner)
 
-    # Header
     ax.text(5.5, 7.5, "🧹  Certificate of Completion",
             ha='center', va='center', fontsize=22, fontweight='bold',
             color='#FFD700', fontfamily='DejaVu Sans')
@@ -202,12 +238,10 @@ def generate_certificate(name):
             ha='center', va='center', fontsize=14, color='#cccccc',
             style='italic')
 
-    # Name
     ax.text(5.5, 5.9, name if name.strip() else "A Proud Data Janitor",
             ha='center', va='center', fontsize=32, fontweight='bold',
             color='#ffffff')
 
-    # Divider line
     ax.plot([1.5, 9.5], [5.35, 5.35], color='#FFD700', linewidth=1, alpha=0.5)
 
     ax.text(5.5, 4.85, "has successfully completed",
@@ -223,7 +257,6 @@ def generate_certificate(name):
             ha='center', va='center', fontsize=12, color='#aaaaaa',
             linespacing=1.8)
 
-    # Module badges
     badges = ["Ground Zero", "Data Janitor", "Matchmaker", "Pivot Pro", "Automation", "Visualization"]
     badge_x = [1.0, 2.9, 4.8, 6.2, 8.0, 9.6]
     for i, (badge, x) in enumerate(zip(badges, badge_x)):
@@ -233,11 +266,10 @@ def generate_certificate(name):
         ax.text(x, 2.1, badge, ha='center', va='center', fontsize=6.5,
                 color='#aaaaaa')
 
-    # Footer
     ax.text(5.5, 1.2, "You are officially a Data Janitor. The spreadsheet fears you.",
             ha='center', va='center', fontsize=11, color='#888888', style='italic')
 
-    ax.text(5.5, 0.65, "python4datajan itors.com",
+    ax.text(5.5, 0.65, "python4datajanitors.com",
             ha='center', va='center', fontsize=9, color='#555555')
 
     plt.tight_layout(pad=0)
@@ -247,6 +279,38 @@ def generate_certificate(name):
     buf.seek(0)
     plt.close()
     return buf
+
+
+# ==========================================
+# THE PHASE 2 GATEKEEPER (BOUNCER)
+# ==========================================
+phase_2_modules = [
+    "Module 6: The Blueprint",
+    "Module 7: The Time Machine",
+    "Module 8: The SQL Surgeon",
+    "Module 9: The Output Architect"
+]
+
+# If they clicked a Phase 2 module, but haven't unlocked it yet...
+if current_module in phase_2_modules and st.session_state['phase2_unlocked'] == False:
+    st.title("🔒 Phase 2 is Locked")
+    st.markdown("### Welcome to The Architect Level.")
+    st.warning(
+        "You must receive the master password from the instructor to proceed. You should only be here if you have completely mastered Phase 1.")
+
+    # The password input box
+    entered_password = st.text_input("Enter Password to Unlock Phase 2:", type="password")
+
+    if st.button("Unlock"):
+        if entered_password == "Architect2026":  # <-- You can change this password!
+            st.session_state['phase2_unlocked'] = True
+            st.success("Access Granted! Reloading...")
+            st.rerun()
+        else:
+            st.error("🚨 Incorrect Password.")
+
+    # This acts as a brick wall, preventing Python from rendering the locked module!
+    st.stop()
 
 # ==========================================
 # 🏠 HOME / LANDING PAGE
@@ -260,7 +324,8 @@ if current_module == "🏠 Home":
     """, unsafe_allow_html=True)
 
     st.markdown('<p class="hero-title">🧹 Python for Data Janitors</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-sub">The no-fluff Python course built for people who live in spreadsheets.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-sub">The no-fluff Python course built for people who live in spreadsheets.</p>',
+                unsafe_allow_html=True)
     st.write("---")
 
     st.markdown("""
@@ -275,19 +340,25 @@ if current_module == "🏠 Home":
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("**📍 Module 0: Ground Zero**\nGet Python talking to your files. The hardest part — and you'll nail it first.")
+        st.info(
+            "**📍 Module 0: Ground Zero**\nGet Python talking to your files. The hardest part — and you'll nail it first.")
     with col2:
-        st.info("**🧹 Module 1: The Data Janitor**\nFix broken names, phones, emails, and dates. Automate the cleanup work you do by hand every week.")
+        st.info(
+            "**🧹 Module 1: The Data Janitor**\nFix broken names, phones, emails, and dates. Automate the cleanup work you do by hand every week.")
     with col3:
-        st.info("**🧩 Module 2: The Matchmaker**\nRename columns, kill duplicates, filter junk, and replace VLOOKUP forever with a real merge.")
+        st.info(
+            "**🧩 Module 2: The Matchmaker**\nRename columns, kill duplicates, filter junk, and replace VLOOKUP forever with a real merge.")
 
     col4, col5, col6 = st.columns(3)
     with col4:
-        st.info("**📊 Module 3: Pivot Table Pro**\nGroup, sum, and aggregate data the way Excel Pivot Tables always promised but never delivered.")
+        st.info(
+            "**📊 Module 3: Pivot Table Pro**\nGroup, sum, and aggregate data the way Excel Pivot Tables always promised but never delivered.")
     with col5:
-        st.info("**⚙️ Module 4: The Automation Engine**\nProcess an entire folder of CSV files in one script. No more opening each one by hand.")
+        st.info(
+            "**⚙️ Module 4: The Automation Engine**\nProcess an entire folder of CSV files in one script. No more opening each one by hand.")
     with col6:
-        st.info("**📈 Module 5: The Presentation Layer**\nTurn your clean data into line charts, bar charts, and pie charts your leadership can read.")
+        st.info(
+            "**📈 Module 5: The Presentation Layer**\nTurn your clean data into line charts, bar charts, and pie charts your leadership can read.")
 
     st.write("---")
     st.markdown("### 🛠️ What You'll Need")
@@ -311,7 +382,8 @@ if current_module == "🏠 Home":
 elif current_module == "🛠️ Setup: Before You Begin":
     st.title("🛠️ Before You Begin")
     st.subheader("Get Python, PyCharm, and Pandas on your computer")
-    st.markdown("This takes about **10–15 minutes** and you only have to do it once. Follow the three steps below in order.")
+    st.markdown(
+        "This takes about **10–15 minutes** and you only have to do it once. Follow the three steps below in order.")
     st.write("---")
 
     with st.expander("Step 1: Install Python", expanded=True):
@@ -321,13 +393,14 @@ elif current_module == "🛠️ Setup: Before You Begin":
         1. Go to **[python.org/downloads](https://www.python.org/downloads/)**
         2. Click the big yellow **"Download Python"** button — it will automatically pick the right version for your computer.
         3. Run the installer. 
-        
+
         🚨 **Critical:** On the very first screen of the installer, check the box that says **"Add Python to PATH"** before you click Install. If you miss this, things will break later.
-        
+
         4. Click **Install Now** and let it finish.
         5. When it's done, you can close the installer.
         """)
-        st.success("✅ How to know it worked: Open your terminal (search 'Command Prompt' on Windows) and type `python --version`. You should see a version number, not an error.")
+        st.success(
+            "✅ How to know it worked: Open your terminal (search 'Command Prompt' on Windows) and type `python --version`. You should see a version number, not an error.")
 
     with st.expander("Step 2: Install PyCharm"):
         st.markdown("""
@@ -339,7 +412,8 @@ elif current_module == "🛠️ Setup: Before You Begin":
         4. Open PyCharm once it's installed.
         5. On the welcome screen, click **New Project**, give it any name, and click **Create**.
         """)
-        st.success("✅ How to know it worked: You should see a code editor open with a blank file. That's your workspace!")
+        st.success(
+            "✅ How to know it worked: You should see a code editor open with a blank file. That's your workspace!")
 
     with st.expander("Step 3: Install Pandas & Matplotlib"):
         st.markdown("""
@@ -353,18 +427,16 @@ elif current_module == "🛠️ Setup: Before You Begin":
         3. You'll see a bunch of text scroll by. That's normal — it's downloading the libraries.
         4. Wait for it to finish. It usually takes 30–60 seconds.
         """)
-        st.success("✅ How to know it worked: The last line should say something like `Successfully installed pandas...`. If you see that, you're done!")
+        st.success(
+            "✅ How to know it worked: The last line should say something like `Successfully installed pandas...`. If you see that, you're done!")
 
     with st.expander("🆘 Something went wrong?"):
         st.markdown("""
-        **"Python is not recognized as a command"**  
-        You probably missed the "Add Python to PATH" checkbox during install. Uninstall Python, re-run the installer, and make sure to check that box.
+        **"Python is not recognized as a command"** You probably missed the "Add Python to PATH" checkbox during install. Uninstall Python, re-run the installer, and make sure to check that box.
 
-        **PyCharm says "No Python interpreter selected"**  
-        Click the interpreter selector in the bottom-right corner of PyCharm and select the Python version you installed.
+        **PyCharm says "No Python interpreter selected"** Click the interpreter selector in the bottom-right corner of PyCharm and select the Python version you installed.
 
-        **pip install says "pip is not recognized"**  
-        Try `python -m pip install pandas matplotlib` instead.
+        **pip install says "pip is not recognized"** Try `python -m pip install pandas matplotlib` instead.
 
         Still stuck? Google the exact error message — Stack Overflow will have the answer. This is a rite of passage for every developer. 😅
         """)
@@ -372,6 +444,31 @@ elif current_module == "🛠️ Setup: Before You Begin":
     st.write("---")
     st.success("🎉 All three steps done? You're ready to write your first script. Head to Module 0!")
     next_module_button(current_module)
+
+
+# ==========================================
+# PHASE 1 LANDING PAGE
+# ==========================================
+elif current_module == "--- PHASE 1: THE BASICS ---":
+    st.title("🧹 Phase 1: The Data Janitor")
+    st.subheader("Mastering the Foundation")
+
+    st.markdown("""
+    Welcome to Phase 1. Before you can build skyscrapers, you have to learn how to clear the rubble. 
+
+    In this phase, you will learn the fundamental skills required to take messy, human-entered data and force it into clean, predictable formats that computers can actually read.
+
+    ### Your Curriculum:
+    * **Module 0: Ground Zero** - How to open and save files using Python.
+    * **Module 1: The Data Janitor** - Formatting text, fixing blanks, and standardizing dates.
+    * **Module 2: The Matchmaker** - Mapping headers, dropping duplicates, and VLOOKUPs (Joins).
+    * **Module 3: The Pivot Table Upgrader** - Grouping and summarizing massive datasets.
+    * **Module 4: The Automation Engine** - Using loops to process 100 files at once.
+    * **Module 5: The Presentation Layer** - Turning your clean data into visual charts.
+
+    👈 **Click Module 0 in the sidebar to begin your training!**
+    """)
+
 
 # ==========================================
 # MODULE 0: GROUND ZERO
@@ -508,7 +605,8 @@ MICHAEL, Brown,michael.b@email.com,555-111-2222,2026-02-10T11:20:00.000Z"""
         """)
 
     st.write("---")
-    st.success("✅ **What you just learned:** How to import a library, read a CSV from a file path, and save a new file with code. This is the foundation everything else is built on.")
+    st.success(
+        "✅ **What you just learned:** How to import a library, read a CSV from a file path, and save a new file with code. This is the foundation everything else is built on.")
     next_module_button(current_module)
 
 # ==========================================
@@ -593,7 +691,6 @@ df['System_Timestamp'] = pd.to_datetime(df['System_Timestamp'])
 df['System_Timestamp'] = df['System_Timestamp'].dt.strftime('%m/%d/%Y')
             """, language="python")
 
-
     with tab_boss:
         st.subheader("🏁 The Boss Level: Check Your Work")
         st.info("Upload your final `Clean_Output.csv` here. If you successfully cleaned the emails, you pass!")
@@ -610,16 +707,19 @@ df['System_Timestamp'] = df['System_Timestamp'].dt.strftime('%m/%d/%Y')
 
                 if missing_emails == 0 and is_lower:
                     st.session_state.completed.add(current_module)
+                    st.session_state['mod1_passed'] = True
                     st.success("🎉 BOOM! You successfully scrubbed the data!")
                     st.balloons()
                     st.dataframe(clean_df)
                     st.write("---")
-                    st.success("✅ **What you just learned:** `.str` methods for text cleaning, `.fillna()` and `.dropna()` for missing data, regex for pattern replacement, and date parsing with `pd.to_datetime()`.")
+                    st.success(
+                        "✅ **What you just learned:** `.str` methods for text cleaning, `.fillna()` and `.dropna()` for missing data, regex for pattern replacement, and date parsing with `pd.to_datetime()`.")
                     next_module_button(current_module)
                 else:
                     st.error("🚨 Not quite! The 'Email' column still has some issues.")
                     if missing_emails > 0:
-                        st.warning(f"Hint: I still see {missing_emails} completely blank email addresses. Check Challenge 2!")
+                        st.warning(
+                            f"Hint: I still see {missing_emails} completely blank email addresses. Check Challenge 2!")
                     if not is_lower:
                         st.warning("Hint: Some of the emails still have CAPITAL letters in them. Check Challenge 1!")
 
@@ -691,7 +791,8 @@ charlie.b@email.com,Parkview"""
         Rename `Applicant_First` to `First_Name` and `Mail_Address` to `Email` so they match our standard format.
         """)
         with st.expander("💡 Need a hint?"):
-            st.write("Use `.rename()` with a Python Dictionary! A dictionary is just a mapping of `{'Old_Name': 'New_Name'}`.")
+            st.write(
+                "Use `.rename()` with a Python Dictionary! A dictionary is just a mapping of `{'Old_Name': 'New_Name'}`.")
             st.code("""
 column_mapping = {
     'Applicant_First': 'First_Name',
@@ -719,7 +820,8 @@ df = df.drop_duplicates(subset=['Email'], keep='first')
         Find any row where the `Email` contains `@python4u.com` and completely remove it from the dataset.
         """)
         with st.expander("💡 Need a hint?"):
-            st.write("The `~` symbol in Python means 'NOT'. We are telling Pandas: Keep the rows where the email does NOT contain our company domain.")
+            st.write(
+                "The `~` symbol in Python means 'NOT'. We are telling Pandas: Keep the rows where the email does NOT contain our company domain.")
             st.code("""
 # The ~ symbol flips the search to find the opposite!
 df = df[~df['Email'].str.contains('@python4u.com', na=False)]
@@ -731,7 +833,8 @@ df = df[~df['Email'].str.contains('@python4u.com', na=False)]
         **Your Mission:** Load `Property_Roster.csv` as a second dataframe and merge it into your main data so every lead has an `Assigned_Property` attached to them based on their email.
         """)
         with st.expander("💡 Need a hint?"):
-            st.write("In Python, we don't VLOOKUP. We Merge. It's infinitely faster and won't crash your computer. ***Bonus-*** Challenge yourself to make a variable at the top of your script, like df2=")
+            st.write(
+                "In Python, we don't VLOOKUP. We Merge. It's infinitely faster and won't crash your computer. ***Bonus-*** Challenge yourself to make a variable at the top of your script, like df2=")
             st.code("""
 # 1. Load the second file
 roster_df = pd.read_csv(r"C:\\Your\\Path\\Property_Roster.csv")
@@ -739,7 +842,6 @@ roster_df = pd.read_csv(r"C:\\Your\\Path\\Property_Roster.csv")
 # 2. Merge them together (telling Python to match them on the 'Email' column)
 df = pd.merge(df, roster_df, on='Email', how='left')
             """, language="python")
-
 
     with tab_boss:
         st.subheader("🏁 The Boss Level: Check Your Work")
@@ -759,16 +861,19 @@ df = pd.merge(df, roster_df, on='Email', how='left')
 
                 if cols_correct and no_dupes and no_tests:
                     st.session_state.completed.add(current_module)
+                    st.session_state['mod2_passed'] = True
                     st.success("🎉 INCREDIBLE! You mapped, deduplicated, filtered, and joined like a pro!")
                     st.balloons()
                     st.dataframe(mod2_df)
                     st.write("---")
-                    st.success("✅ **What you just learned:** `.rename()` to standardize columns, `.drop_duplicates()` to kill dupes, boolean filtering with `~` to remove junk rows, and `pd.merge()` to replace VLOOKUP forever.")
+                    st.success(
+                        "✅ **What you just learned:** `.rename()` to standardize columns, `.drop_duplicates()` to kill dupes, boolean filtering with `~` to remove junk rows, and `pd.merge()` to replace VLOOKUP forever.")
                     next_module_button(current_module)
                 else:
                     st.error("🚨 Not quite! There's still some junk in the trunk.")
                     if not cols_correct:
-                        st.warning("Hint: Check Challenges 1 & 4. I'm missing 'First_Name', 'Email', or 'Assigned_Property'.")
+                        st.warning(
+                            "Hint: Check Challenges 1 & 4. I'm missing 'First_Name', 'Email', or 'Assigned_Property'.")
                     if not no_dupes:
                         st.warning("Hint: Check Challenge 2. I'm still seeing duplicate emails in here!")
                     if not no_tests:
@@ -807,7 +912,8 @@ Violet,15,45000,Lakeside,1B1B,1500,1"""
     # Live preview metrics from the sample data
     st.write("---")
     st.write("### 📌 A Sneak Peek: What This Data Becomes")
-    st.caption("This is what your finished groupby output will look like — presented as a real dashboard metric card. By the end of this module, you'll have built the numbers behind these.")
+    st.caption(
+        "This is what your finished groupby output will look like — presented as a real dashboard metric card. By the end of this module, you'll have built the numbers behind these.")
     preview_df = pd.read_csv(pd.io.common.StringIO(module3_data))
     total_sales = preview_df['Total_Sales'].sum()
     top_rep = preview_df.groupby('Sales_Rep')['Total_Sales'].sum().idxmax()
@@ -819,7 +925,8 @@ Violet,15,45000,Lakeside,1B1B,1500,1"""
 
     st.write("---")
     st.markdown("### The Janitor Challenges: Round 3")
-    tab1, tab2, tab3, tab_boss = st.tabs(["Challenge 1: Leaderboard", "Challenge 2: Custom Math", "Challenge 3: Roll-Up", "🏁 Boss Level"])
+    tab1, tab2, tab3, tab_boss = st.tabs(
+        ["Challenge 1: Leaderboard", "Challenge 2: Custom Math", "Challenge 3: Roll-Up", "🏁 Boss Level"])
 
     with tab1:
         st.subheader("Challenge 1: Sales Rep Leaderboard")
@@ -850,10 +957,10 @@ rep_stats['Net_Sales_Per_Appt'] = rep_stats['Total_Sales'] / rep_stats['Appointm
             st.code("rent_roll = df.groupby('Floorplan').agg({'Rent': 'mean', 'Occupied': 'sum'}).reset_index()",
                     language="python")
 
-
     with tab_boss:
         st.subheader("🏁 The Boss Level: Check Your Work")
-        st.info("Upload your final leaderboard CSV. It needs the `Net_Sales_Per_Appt` column and should have one row per Sales Rep (3 reps = 3 rows).")
+        st.info(
+            "Upload your final leaderboard CSV. It needs the `Net_Sales_Per_Appt` column and should have one row per Sales Rep (3 reps = 3 rows).")
 
         uploaded_mod3 = st.file_uploader("Drop your Grouped Output here", type="csv")
         if uploaded_mod3 is not None:
@@ -864,18 +971,22 @@ rep_stats['Net_Sales_Per_Appt'] = rep_stats['Total_Sales'] / rep_stats['Appointm
 
                 if has_col and right_rows:
                     st.session_state.completed.add(current_module)
+                    st.session_state['mod3_passed'] = True
                     st.success("🎉 NAILED IT! You just out-pivoted Excel!")
                     st.balloons()
                     st.dataframe(mod3_df)
                     st.write("---")
-                    st.success("✅ **What you just learned:** `.groupby()` for pivot-table-style summaries, grouping multiple columns at once, `.agg()` for mixed math, and creating calculated columns from grouped results.")
+                    st.success(
+                        "✅ **What you just learned:** `.groupby()` for pivot-table-style summaries, grouping multiple columns at once, `.agg()` for mixed math, and creating calculated columns from grouped results.")
                     next_module_button(current_module)
                 else:
                     st.error("🚨 Almost there!")
                     if not has_col:
-                        st.warning("Hint: I don't see a `Net_Sales_Per_Appt` column. Make sure you completed Challenge 2 and saved that column into your output file.")
+                        st.warning(
+                            "Hint: I don't see a `Net_Sales_Per_Appt` column. Make sure you completed Challenge 2 and saved that column into your output file.")
                     if not right_rows:
-                        st.warning(f"Hint: I'm seeing {len(mod3_df)} rows but expected 3 (one per Sales Rep). Make sure you grouped by `Sales_Rep` before saving.")
+                        st.warning(
+                            f"Hint: I'm seeing {len(mod3_df)} rows but expected 3 (one per Sales Rep). Make sure you grouped by `Sales_Rep` before saving.")
             except Exception as e:
                 st.error("Error reading file. Did you save it as a CSV?")
 
@@ -889,7 +1000,8 @@ elif current_module == "Module 4: The Automation Engine":
         "Writing code for one file is cool. Having Python automatically find and process 100 files in 3 seconds is a superpower.")
 
     st.write("### 📥 Step 1: Get the Regional Data")
-    st.write("Download these two files and put them in a new folder called `Monthly_Stack` inside your `Python_Playground` folder.")
+    st.write(
+        "Download these two files and put them in a new folder called `Monthly_Stack` inside your `Python_Playground` folder.")
 
     north_data = """Rep,Region,Leads,Closed_Deals,Revenue
 Violet,North,45,12,60000
@@ -914,7 +1026,8 @@ Hank,South,60,18,90000"""
                            file_name="South_Region.csv", mime="text/csv")
 
     st.write("---")
-    tab1, tab2, tab3, tab_boss = st.tabs(["Challenge 1: Monthly Stack", "Challenge 2: Multi-CRM", "Challenge 3: Portfolio Loop", "🏁 Boss Level"])
+    tab1, tab2, tab3, tab_boss = st.tabs(
+        ["Challenge 1: Monthly Stack", "Challenge 2: Multi-CRM", "Challenge 3: Portfolio Loop", "🏁 Boss Level"])
 
     with tab1:
         st.subheader("Challenge 1: The Monthly Roll-Up")
@@ -966,10 +1079,10 @@ for file in all_files:
     dataframes_list.append(temp_df)
             """, language="python")
 
-
     with tab_boss:
         st.subheader("🏁 The Boss Level: Check Your Work")
-        st.info("Stack both region files and save the combined output as a CSV. It should have all 10 reps and a `Source_File` column. Upload it here!")
+        st.info(
+            "Stack both region files and save the combined output as a CSV. It should have all 10 reps and a `Source_File` column. Upload it here!")
 
         uploaded_mod4 = st.file_uploader("Drop your Stacked Output here", type="csv")
         if uploaded_mod4 is not None:
@@ -986,20 +1099,25 @@ for file in all_files:
 
                 if has_source and enough_rows and has_both_regions:
                     st.session_state.completed.add(current_module)
+                    st.session_state['mod4_passed'] = True
                     st.success("🎉 AUTOMATED! You just processed an entire folder of files in one script!")
                     st.balloons()
                     st.dataframe(mod4_df)
                     st.write("---")
-                    st.success("✅ **What you just learned:** `glob` to find files by pattern, `for` loops to process them one by one, `pd.concat()` to stack dataframes, and `os.path.basename()` to track data sources.")
+                    st.success(
+                        "✅ **What you just learned:** `glob` to find files by pattern, `for` loops to process them one by one, `pd.concat()` to stack dataframes, and `os.path.basename()` to track data sources.")
                     next_module_button(current_module)
                 else:
                     st.error("🚨 Not quite!")
                     if not enough_rows:
-                        st.warning(f"Hint: I only see {len(mod4_df)} rows. Both region files together should give you 10 reps. Did you stack both files?")
+                        st.warning(
+                            f"Hint: I only see {len(mod4_df)} rows. Both region files together should give you 10 reps. Did you stack both files?")
                     if not has_source:
-                        st.warning("Hint: I don't see a `Source_File` column. Make sure you completed Challenge 3 and added the filename as a column!")
+                        st.warning(
+                            "Hint: I don't see a `Source_File` column. Make sure you completed Challenge 3 and added the filename as a column!")
                     if has_source and not has_both_regions:
-                        st.warning("Hint: Looks like only one region made it in. Make sure your glob is picking up both North and South files.")
+                        st.warning(
+                            "Hint: Looks like only one region made it in. Make sure your glob is picking up both North and South files.")
 
             except Exception as e:
                 st.error("Error reading file. Did you save the combined output as a CSV?")
@@ -1021,7 +1139,8 @@ elif current_module == "Module 5: The Presentation Layer":
     )
 
     st.write("---")
-    tab1, tab2, tab3, tab_boss = st.tabs(["Challenge 1: Trend Tracker", "Challenge 2: Portfolio Bar", "Challenge 3: Status Pie", "🏁 Boss Level"])
+    tab1, tab2, tab3, tab_boss = st.tabs(
+        ["Challenge 1: Trend Tracker", "Challenge 2: Portfolio Bar", "Challenge 3: Status Pie", "🏁 Boss Level"])
 
     with tab1:
         st.subheader("Challenge 1: The Trend Tracker")
@@ -1066,26 +1185,261 @@ plt.show()
 
         if uploaded_chart is not None:
             st.session_state.completed.add(current_module)
+            st.session_state['mod5_passed'] = True
             st.success("🎉 GRADUATION COMPLETE! You are officially a Data Janitor!")
             st.balloons()
             st.image(uploaded_chart, caption="Your Python Masterpiece, proudly displayed on the digital fridge.")
             st.write("---")
-            st.success("✅ **What you just learned:** `matplotlib` for chart creation, `.plot()` with `kind=` to switch chart types, and `.value_counts()` to summarize categorical data before plotting.")
+            st.success(
+                "✅ **What you just learned:** `matplotlib` for chart creation, `.plot()` with `kind=` to switch chart types, and `.value_counts()` to summarize categorical data before plotting.")
 
-            # ---- CERTIFICATE ----
-            st.write("---")
-            st.subheader("🎓 Claim Your Certificate")
-            grad_name = st.text_input("Enter your name for the certificate:", placeholder="e.g. John Cena")
-            if grad_name:
-                cert_buf = generate_certificate(grad_name)
-                st.image(cert_buf, caption="Right-click the image to save it!")
-                st.download_button(
-                    label="📥 Download Certificate",
-                    data=cert_buf,
-                    file_name="DataJanitor_Certificate.png",
-                    mime="image/png"
-                )
-            st.info("🏆 Head back through the sidebar — any modules without a ✅ are still waiting for you!")
+# ==========================================
+# PHASE 1 GRADUATION
+# ==========================================
+elif current_module == "🎓 Phase 1 Graduation":
+    st.title("🎓 Phase 1 Graduation")
+
+    # Check if they actually passed everything!
+    passed_all = all([
+        st.session_state['mod1_passed'],
+        st.session_state['mod2_passed'],
+        st.session_state['mod3_passed'],
+        st.session_state['mod4_passed'],
+        st.session_state['mod5_passed']
+    ])
+
+    if not passed_all:
+        st.warning(
+            "🚨 You haven't completed all the Phase 1 modules yet! Check the sidebar menu to see which ✅ checkmarks you are missing.")
+    else:
+        st.balloons()
+        st.success("🎉 CONGRATULATIONS! You have successfully completed Phase 1: The Data Janitor.")
+        st.markdown("""
+        You've proven you can write Python code to format text, destroy duplicates, group massive datasets, automate file loops, and generate visual charts.
+
+        **The spreadsheet fears you.**
+        """)
+
+        st.write("---")
+        st.subheader("📜 Claim Your Certificate")
+        grad_name = st.text_input("Enter your name as you want it to appear on the certificate:",
+                                  placeholder="e.g. Amanda Salvador")
+
+        if grad_name:
+            cert_buf = generate_certificate(grad_name)
+            st.image(cert_buf, caption="Right-click the image to save it, or use the download button below!")
+            st.download_button(
+                label="📥 Download Official Certificate",
+                data=cert_buf,
+                file_name="DataJanitor_Certificate.png",
+                mime="image/png"
+            )
+
+        st.write("---")
+        st.info(
+            "Ready for the next challenge? Get the master password from your instructor and click on **Module 6** to begin Phase 2: The Architect.")
+# ==========================================
+# PHASE 2 LANDING PAGE
+# ==========================================
+elif current_module == "--- PHASE 2: THE ARCHITECT ---":
+    st.title("🏗️ Phase 2: The Architect")
+    st.subheader("From Writing Scripts to Building Systems")
+
+    st.markdown("""
+    You have mastered the broom. Now it is time to build. 
+
+    In the real world, developers rarely write code from scratch. 90% of the job is taking an existing, complex production script and rewiring it for a new business need. 
+
+    In this phase, we are going to dismantle the `sp_lookbacks.py` script piece by piece, and repurpose it to build a brand new Journey Suppression tool.
+
+    ### Your Curriculum:
+    * **Module 6: The Blueprint** - Changing where a script looks for its input files.
+    * **Module 7: The Time Machine** - Replacing hardcoded dates with dynamic, automated calendars.
+    * **Module 8: The SQL Surgeon** - Injecting Python variables directly into Snowflake queries.
+    * **Module 9: The Output Architect** - Generating dynamic filenames based on today's date.
+
+    🚨 **Note:** Phase 2 is locked! 
+    👈 **Click Module 6 in the sidebar and enter the master password to unlock this phase.**
+    """)
+
+
+# ==========================================
+# MODULE 6: THE BLUEPRINT
+# ==========================================
+elif current_module == "Module 6: The Blueprint":
+    st.title("🏗️ The Blueprint")
+    st.subheader("Phase 2 | Module 6: Rewiring the Inputs")
+    st.markdown("""
+    Welcome to Phase 2. You are no longer just writing scripts from scratch; you are taking a massive, 300-line production script (`sp_lookbacks.py`) and stripping it down to build something new. 
+
+    The first step in rewiring a script is changing where it looks for instructions.
+    """)
+    st.write("---")
+
+    st.subheader("Challenge: The SharePoint Reroute")
+    st.markdown("""
+    **The Scenario:** The old script looks for a template file in `Data Analytics/Shopper Suite/Lookbacks/Templates`. Your new script needs to look in `Data Governance/Suppression/By Journey/Templates`.
+
+    Furthermore, our new CSV template is much simpler. We only need to pull 5 specific columns from it to power our script.
+    """)
+
+    with st.expander("💡 See how to strip it down"):
+        st.write(
+            "In Python, we use variables to store these paths so we only have to type them once. Here is what your new setup block should look like:")
+        st.code("""
+# 1. Update the folder locations
+MAIN_FOLDER = 'Data Governance/Suppression/By Journey'
+TEMPLATE_FOLDER = f'{MAIN_FOLDER}/Templates'
+TEMPLATE_FILENAME = 'Journey_Suppression_Template.csv'
+
+# 2. Pretend we loaded the CSV. Now we extract just the 5 variables we need for this specific run:
+client_name = str(row.get('client_name', '')).strip()
+ohq = str(row.get('ohq', '')).strip()
+source_client_id = str(row.get('source_client_id', '')).strip()
+segment = str(row.get('segment', '')).strip()
+        """, language="python")
+
+    st.info("Check off this module once you understand how to re-route folder paths in an existing script!")
+    if st.button("✅ I understand how to change inputs"):
+        st.session_state['mod6_passed'] = True
+        st.session_state.completed.add(current_module)
+        next_module_button(current_module)
+
+# ==========================================
+# MODULE 7: THE TIME MACHINE
+# ==========================================
+elif current_module == "Module 7: The Time Machine":
+    st.title("⏳ The Time Machine")
+    st.subheader("Phase 2 | Module 7: Static vs. Dynamic Dates")
+    st.markdown("""
+    If you hardcode dates into a script, you have to manually edit the code every single time you run it. We want Python to be smart enough to figure out the dates itself.
+
+    Our business rule: **We always want the data from the 1st of the current month up to today.**
+    """)
+    st.write("---")
+
+    tab1, tab2 = st.tabs(["Step 1: The Static Way (Beginner)", "Step 2: The Dynamic Way (Pro)"])
+
+    with tab1:
+        st.markdown(
+            "**The Static Way** means typing the exact strings into the code. It works, but it requires human intervention next month.")
+        st.code("""
+# This works today, but it will be wrong next month!
+start_date = '2026-03-01'
+end_date = '2026-03-12'
+        """, language="python")
+
+    with tab2:
+        st.markdown(
+            "**The Dynamic Way** uses Python's built-in `datetime` library to act as a calendar. It calculates the 1st of the month automatically, no matter what day you run the script.")
+        st.code("""
+from datetime import date
+
+# Get today's exact date
+today = date.today()
+
+# Tell Python: "Take today's date, but rewind the day to the 1st"
+start_of_month = today.replace(day=1)
+
+# Format them into strings so the SQL database can read them (YYYY-MM-DD)
+start_date = start_of_month.strftime('%Y-%m-%d')
+end_date = today.strftime('%Y-%m-%d')
+
+print(f"Running data from {start_date} to {end_date}")
+        """, language="python")
+
+    st.info(
+        "Dynamic dates are the secret to true automation. Once you master `strftime`, you never have to type a date manually again.")
+    if st.button("✅ I've mastered time travel"):
+        st.session_state['mod7_passed'] = True
+        st.session_state.completed.add(current_module)
+        next_module_button(current_module)
+
+# ==========================================
+# MODULE 8: THE SQL SURGEON
+# ==========================================
+elif current_module == "Module 8: The SQL Surgeon":
+    st.title("🩺 The SQL Surgeon")
+    st.subheader("Phase 2 | Module 8: Injecting Variables into Queries")
+    st.markdown("""
+    The original `sp_lookbacks.py` script has a massive, 50-line SQL query with complex joins. Our new script doesn't need all that. 
+
+    We need to write a clean, simple query and **inject** the variables we created in Modules 6 and 7 directly into the SQL text.
+    """)
+    st.write("---")
+
+    st.markdown("### Python f-strings")
+    st.write(
+        "By putting an `f` before the quotes, we can inject Python variables directly into our SQL query using curly braces `{}`.")
+
+    st.code("""
+# Notice the 'f' right before the triple quotes!
+sql_query = f'''
+    SELECT 
+        addressid,
+        full_address,
+        segment,
+        result_date
+    FROM 
+        daily_client_households
+    WHERE 
+        source_client_id = '{source_client_id}'
+        AND result_date BETWEEN '{start_date}' AND '{end_date}'
+        AND LOWER(segment) LIKE '%{segment}%'
+'''
+
+# Now we send that dynamic query to Snowflake
+df_raw = sfc(sql_query)
+    """, language="python")
+
+    st.success(
+        "By doing it this way, the SQL query rebuilds itself perfectly for every single row in your SharePoint CSV template!")
+    if st.button("✅ I understand SQL injection"):
+        st.session_state['mod8_passed'] = True
+        st.session_state.completed.add(current_module)
+        next_module_button(current_module)
+
+# ==========================================
+# MODULE 9: THE OUTPUT ARCHITECT
+# ==========================================
+elif current_module == "Module 9: The Output Architect":
+    st.title("📦 The Output Architect")
+    st.subheader("Phase 2 | Module 9: Dynamic Filenames")
+    st.markdown("""
+    You've pulled the data. Now we need to save it exactly the way the business asked for it. 
+
+    The requirement is strict: Every output file must follow the exact naming convention: `ohq__generic__services__yymmdd.csv`.
+    """)
+    st.write("---")
+
+    st.markdown("### Constructing the Filename")
+    st.write(
+        "We will use our dynamic date tool from Module 7 to format today's date into the weird `yymmdd` format (like 260312), and use an f-string to piece it all together.")
+
+    st.code("""
+from datetime import date
+
+# 1. Format today's date as just YearMonthDay (e.g., 260312)
+yymmdd = date.today().strftime('%y%m%d')
+
+# 2. Build the filename using the OHQ variable we grabbed in Module 6
+# It will look like: 12345__generic__services__260312.csv
+final_filename = f"{ohq}__generic__services__{yymmdd}.csv"
+
+# 3. Save the dataframe to that file
+df_raw.to_csv(final_filename, index=False)
+
+print(f"Successfully saved: {final_filename}")
+    """, language="python")
+
+    st.info(
+        "Check this off to complete Phase 2. You now have all the puzzle pieces to strip down the Lookbacks script and build the new Journey Suppression script!")
+
+    if st.button("✅ I am officially a Script Architect"):
+        st.session_state['mod9_passed'] = True
+        st.session_state.completed.add(current_module)
+        st.balloons()
+        st.success("🎉 You've completed Phase 2! Head to the Feedback tab to let us know how it went.")
 
 # ==========================================
 # 📝 FEEDBACK
