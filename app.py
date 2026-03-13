@@ -73,9 +73,14 @@ if 'mod7_passed' not in st.session_state: st.session_state['mod7_passed'] = Fals
 if 'mod8_passed' not in st.session_state: st.session_state['mod8_passed'] = False
 if 'mod9_passed' not in st.session_state: st.session_state['mod9_passed'] = False
 
-# The Phase 2 Master Lock
-if 'phase2_unlocked' not in st.session_state:
-    st.session_state['phase2_unlocked'] = False
+# Add the Phase 1, 2, & 3 modules to the tracking lists
+for i in range(1, 13):
+    if f'mod{i}_passed' not in st.session_state:
+        st.session_state[f'mod{i}_passed'] = False
+
+# The Master Locks
+if 'phase2_unlocked' not in st.session_state: st.session_state['phase2_unlocked'] = False
+if 'phase3_unlocked' not in st.session_state: st.session_state['phase3_unlocked'] = False
 
 NEXT_MODULE = {
     "🏠 Home": "🛠️ Setup: Before You Begin",
@@ -88,35 +93,34 @@ NEXT_MODULE = {
     "Module 4: The Automation Engine": "Module 5: The Presentation Layer",
     "Module 5: The Presentation Layer": "🎓 Phase 1 Graduation",
     "🎓 Phase 1 Graduation": "📝 Feedback",
-    "📝 Feedback": "--- PHASE 2: THE ARCHITECT ---",
-    "--- PHASE 2: THE ARCHITECT ---": "Module 6: The Blueprint",
-    "Module 6: The Blueprint": "Module 7: The Time Machine",
-    "Module 7: The Time Machine": "Module 8: The SQL Surgeon",
-    "Module 8: The SQL Surgeon": "Module 9: The Output Architect"
+    "📝 Feedback": "--- PHASE 2: LOCAL ARCHITECT ---",
+    "--- PHASE 2: LOCAL ARCHITECT ---": "Module 6: Local Paths & Text Prep",
+    "Module 6: Local Paths & Text Prep": "Module 7: The Dictionary Loop",
+    "Module 7: The Dictionary Loop": "Module 8: The Dynamic Inject & Save",
+    "Module 8: The Dynamic Inject & Save": "--- PHASE 3: CLOUD ARCHITECT ---",
+    "--- PHASE 3: CLOUD ARCHITECT ---": "Module 9: The SharePoint Blueprint",
+    "Module 9: The SharePoint Blueprint": "Module 10: The Time Machine",
+    "Module 10: The Time Machine": "Module 11: The SQL Surgeon",
+    "Module 11: The SQL Surgeon": "Module 12: The Output Architect"
 }
 
 COMPLETABLE_MODULES = [
     "Module 1: The Data Janitor", "Module 2: The Matchmaker", "Module 3: The Pivot Table Upgrader",
     "Module 4: The Automation Engine", "Module 5: The Presentation Layer",
-    "Module 6: The Blueprint", "Module 7: The Time Machine", "Module 8: The SQL Surgeon",
-    "Module 9: The Output Architect"
+    "Module 6: Local Paths & Text Prep", "Module 7: The Dictionary Loop", "Module 8: The Dynamic Inject & Save",
+    "Module 9: The SharePoint Blueprint", "Module 10: The Time Machine", "Module 11: The SQL Surgeon", "Module 12: The Output Architect"
 ]
-
 
 # Function to dynamically add checkmarks to the menu
 def format_menu_item(module_name):
-    if module_name == "Module 1: The Data Janitor" and st.session_state['mod1_passed']: return f"✅ {module_name}"
-    if module_name == "Module 2: The Matchmaker" and st.session_state['mod2_passed']: return f"✅ {module_name}"
-    if module_name == "Module 3: The Pivot Table Upgrader" and st.session_state[
-        'mod3_passed']: return f"✅ {module_name}"
-    if module_name == "Module 4: The Automation Engine" and st.session_state['mod4_passed']: return f"✅ {module_name}"
-    if module_name == "Module 5: The Presentation Layer" and st.session_state['mod5_passed']: return f"✅ {module_name}"
-    if module_name == "Module 6: The Blueprint" and st.session_state['mod6_passed']: return f"✅ {module_name}"
-    if module_name == "Module 7: The Time Machine" and st.session_state['mod7_passed']: return f"✅ {module_name}"
-    if module_name == "Module 8: The SQL Surgeon" and st.session_state['mod8_passed']: return f"✅ {module_name}"
-    if module_name == "Module 9: The Output Architect" and st.session_state['mod9_passed']: return f"✅ {module_name}"
+    # Loop through all 12 modules to check for passes
+    for i in range(1, 13):
+        mod_key = f"mod{i}_passed"
+        if mod_key in st.session_state and st.session_state[mod_key]:
+            # This matches the first part of the string, e.g., "Module 1:"
+            if module_name.startswith(f"Module {i}:"):
+                return f"✅ {module_name}"
     return module_name
-
 
 current_module = st.sidebar.radio(
     "Choose a Module:",
@@ -132,16 +136,19 @@ current_module = st.sidebar.radio(
         "Module 5: The Presentation Layer",
         "🎓 Phase 1 Graduation",
         "📝 Feedback",
-        "--- PHASE 2: THE ARCHITECT ---",
-        "Module 6: The Blueprint",
-        "Module 7: The Time Machine",
-        "Module 8: The SQL Surgeon",
-        "Module 9: The Output Architect"
+        "--- PHASE 2: LOCAL ARCHITECT ---",
+        "Module 6: Local Paths & Text Prep",
+        "Module 7: The Dictionary Loop",
+        "Module 8: The Dynamic Inject & Save",
+        "--- PHASE 3: CLOUD ARCHITECT ---",
+        "Module 9: The SharePoint Blueprint",
+        "Module 10: The Time Machine",
+        "Module 11: The SQL Surgeon",
+        "Module 12: The Output Architect"
     ],
     format_func=format_menu_item
 )
 st.session_state.current_module = current_module
-
 # --- Progress Bar ---
 st.sidebar.write("---")
 completed_count = len(st.session_state.completed)
@@ -282,34 +289,46 @@ def generate_certificate(name):
 
 
 # ==========================================
-# THE PHASE 2 GATEKEEPER (BOUNCER)
+# THE GATEKEEPERS (BOUNCERS)
 # ==========================================
 phase_2_modules = [
-    "Module 6: The Blueprint",
-    "Module 7: The Time Machine",
-    "Module 8: The SQL Surgeon",
-    "Module 9: The Output Architect"
+    "Module 6: Local Paths & Text Prep",
+    "Module 7: The Dictionary Loop",
+    "Module 8: The Dynamic Inject & Save"  # <-- Updated name is right here!
+]
+phase_3_modules = [
+    "Module 9: The SharePoint Blueprint",
+    "Module 10: The Time Machine",
+    "Module 11: The SQL Surgeon",
+    "Module 12: The Output Architect"
 ]
 
-# If they clicked a Phase 2 module, but haven't unlocked it yet...
+# Phase 2 Lock
 if current_module in phase_2_modules and st.session_state['phase2_unlocked'] == False:
     st.title("🔒 Phase 2 is Locked")
-    st.markdown("### Welcome to The Architect Level.")
-    st.warning(
-        "You must receive the master password from the instructor to proceed. You should only be here if you have completely mastered Phase 1.")
-
-    # The password input box
-    entered_password = st.text_input("Enter Password to Unlock Phase 2:", type="password")
-
-    if st.button("Unlock"):
-        if entered_password == "Architect2026":  # <-- You can change this password!
+    st.warning("You must receive the master password from the instructor to access company-specific local scripts.")
+    pwd2 = st.text_input("Enter Password to Unlock Phase 2:", type="password")
+    if st.button("Unlock Phase 2"):
+        if pwd2 == "Architect2026":  # <-- Change this password to whatever you like!
             st.session_state['phase2_unlocked'] = True
             st.success("Access Granted! Reloading...")
             st.rerun()
         else:
             st.error("🚨 Incorrect Password.")
+    st.stop()
 
-    # This acts as a brick wall, preventing Python from rendering the locked module!
+# Phase 3 Lock
+if current_module in phase_3_modules and st.session_state['phase3_unlocked'] == False:
+    st.title("🔒 Phase 3 is Locked")
+    st.warning("You must receive the Cloud password to access proprietary SharePoint & Snowflake scripts.")
+    pwd3 = st.text_input("Enter Password to Unlock Phase 3:", type="password")
+    if st.button("Unlock Phase 3"):
+        if pwd3 == "Architect2026":  # <-- Change this password to whatever you like!
+            st.session_state['phase3_unlocked'] = True
+            st.success("Access Granted! Reloading...")
+            st.rerun()
+        else:
+            st.error("🚨 Incorrect Password.")
     st.stop()
 
 # ==========================================
@@ -1238,40 +1257,210 @@ elif current_module == "🎓 Phase 1 Graduation":
         st.write("---")
         st.info(
             "Ready for the next challenge? Get the master password from your instructor and click on **Module 6** to begin Phase 2: The Architect.")
+
 # ==========================================
 # PHASE 2 LANDING PAGE
 # ==========================================
-
-elif current_module == "--- PHASE 2: THE ARCHITECT ---":
-    st.title("🏗️ Phase 2: The Architect")
-    st.subheader("From Writing Scripts to Building Systems")
+elif current_module == "--- PHASE 2: LOCAL ARCHITECT ---":
+    st.title("🖥️ Phase 2: The Local Architect")
+    st.subheader("Modifying a Local Batch Script")
 
     st.markdown("""
-    You have mastered the broom. Now it is time to build. 
+    In the real world, developers rarely write code from scratch. It is almost always easier to take an old script that already works, strip it down, and modify it for your new needs.
 
-    In the real world, developers rarely write code from scratch. **SharePoint connections, APIs, and custom functions can be incredibly challenging to set up.** That is part of the reason it is almost always easier to take an old script that already has the hard parts figured out, strip it down, and modify it for your new needs.
-
-    In this phase, we are going to take an existing production script and repurpose it to build a brand new Journey Suppression tool.
+    Before we tackle complex cloud connections, we are going to modify a simple, local script called `scrub_batch.py`. This script runs on your actual computer, connects to a database, and saves a batch of files to a folder.
 
     ### Your Curriculum:
-    * **Module 6: The Blueprint** - Changing where a script looks for its input files.
-    * **Module 7: The Time Machine** - Replacing hardcoded dates with dynamic, automated calendars.
-    * **Module 8: The SQL Surgeon** - Injecting Python variables directly into Snowflake queries.
-    * **Module 9: The Output Architect** - Generating dynamic filenames based on today's date.
+    * **Module 6: Local Paths & Text Prep** - Loading the input tracker, replacing hardcoded user paths, and cleaning text so it doesn't break file names.
+    * **Module 7: The Dictionary Loop** - Converting Pandas data into a list of dictionaries to run bulk operations.
+    * **Module 8: The Dynamic Inject & Save** - Injecting loop variables directly into SQL queries and saving individual output files dynamically.
 
-    🚨 **Note:** Phase 2 is locked! 
-    👈 **Click Module 6 in the sidebar and enter the master password to unlock this phase.**
+    🚨 **Note:** Phase 2 is locked to protect company logic! 
+    👈 **Click Module 6 in the sidebar and enter the Phase 2 password to unlock.**
     """)
 # ==========================================
-# MODULE 6: THE BLUEPRINT
+# MODULE 6: LOCAL PATHS & TEXT PREP
 # ==========================================
-elif current_module == "Module 6: The Blueprint":
-    st.title("🏗️ The Blueprint")
-    st.subheader("Phase 2 | Module 6: Rewiring the Inputs")
+elif current_module == "Module 6: Local Paths & Text Prep":
+    st.title("🖥️ Local Paths & Text Prep")
+    st.subheader("Phase 2 | Module 6")
     st.markdown("""
-    Welcome to Phase 2. You are taking a massive, 300-line production script (`sp_lookbacks.py`) and stripping it down to build something new. 
+    The original `scrub_batch.py` script was written by Amanda, which means it is hardcoded to look for files on *her* computer (`C:\\Users\\AmandaSalvador\\...`). 
 
-    The first step in rewiring a script is changing where it looks for instructions.
+    If you run this on your computer, it will instantly crash.
+    """)
+    st.write("---")
+
+    st.write("### 📥 Step 1: See the Input Tracker")
+    st.info("Download this sample tracker to see exactly what powers the batch script.")
+
+    # The simulated Tracker data showing why text washing is necessary!
+    tracker_data = """dmsid,project_title,month\n1001,LaFontaine / Mazda | Livonia,March\n1002,LaFontaine / Hyundai | Livonia,March\n1003,LaFontaine / VW | Livonia,March"""
+
+    st.download_button(
+        label="📥 Download template.csv",
+        data=tracker_data,
+        file_name="template.csv",
+        mime="text/csv"
+    )
+
+    st.write("---")
+    st.subheader("Challenge 1: The Path Fix")
+    st.markdown(
+        "We need to replace her paths with relative/generic paths, and ensure the folder actually exists before the script tries to save anything inside it.")
+
+    st.code("""
+import os
+
+# Instead of Amanda's desktop, use a generic folder structure
+input_file_path = r'C:\\Users\\Public\\Documents\\template.csv'
+output_folder_path = r'C:\\Users\\Public\\Documents\\Scrub_Outputs'
+
+# Check if the folder exists, and if not, make Python build it!
+if not os.path.exists(output_folder_path):
+    os.makedirs(output_folder_path)
+    """, language="python")
+
+    st.write("---")
+    st.subheader("Challenge 2: The File Name Washer")
+    st.markdown("""
+    If you looked at the sample tracker, you noticed the project titles are things like `LaFontaine / Mazda | Livonia`.
+
+    **Windows does not allow slashes (`/`) or pipes (`|`) in file names!** If we try to save a file with that text, it will crash. We have to wash the text first.
+    """)
+    st.code("""
+# Replace illegal characters in the entire dataframe before we loop
+dealer_list['project_title'] = dealer_list['project_title'].str.replace(' | ', '_')
+dealer_list['project_title'] = dealer_list['project_title'].str.replace('/', '-')
+    """, language="python")
+
+    if st.button("✅ I understand how to prep local scripts"):
+        st.session_state['mod6_passed'] = True
+        st.session_state.completed.add(current_module)
+        st.balloons()
+        st.success("🎉 Prepped and ready! Let's build the loop.")
+        next_module_button(current_module)
+
+# ==========================================
+# MODULE 7: THE DICTIONARY LOOP
+# ==========================================
+elif current_module == "Module 7: The Dictionary Loop":
+    st.title("🔄 The Dictionary Loop")
+    st.subheader("Phase 2 | Module 7")
+    st.markdown("""
+    We have our `dealer_list` dataframe. But Pandas dataframes aren't great for looping row-by-row to run individual SQL queries. 
+
+    The pro move is to convert the dataframe into a **List of Dictionaries** using `to_dict('records')`.
+    """)
+    st.write("---")
+
+    st.code("""
+# Convert the DataFrame into a format that is incredibly easy to loop through
+dealer_list_dicts = dealer_list.to_dict(orient='records')
+
+# Now, we can easily loop through every single dealer
+for row in dealer_list_dicts:
+
+    # Grab the variables for this specific loop iteration
+    dmsid = row['dmsid']
+    project_title = row['project_title']
+    month = row['month']
+
+    print(f"Now processing {project_title} (ID: {dmsid}) for {month}...")
+
+    # ... (This is where the SQL query will go!) ...
+    """, language="python")
+
+    st.info("Converting dataframes to dictionaries is the secret to batch processing.")
+    if st.button("✅ I've mastered the Dictionary Loop"):
+        st.session_state['mod7_passed'] = True
+        st.session_state.completed.add(current_module)
+        st.balloons()
+        st.success("🎉 Loop engaged! Let's finish the script.")
+        next_module_button(current_module)
+
+# ==========================================
+# MODULE 8: THE DYNAMIC INJECT & SAVE
+# ==========================================
+elif current_module == "Module 8: The Dynamic Inject & Save":
+    st.title("💾 The Dynamic Inject & Save")
+    st.subheader("Phase 2 | Module 8")
+    st.markdown("""
+    Now that we are looping through our dictionary, we need to take action on every single row. 
+
+    We are going to inject our `dmsid` variable into the SQL query to pull the exact data for that dealer, and then dynamically name and save the output file using the `project_title` and `month`.
+    """)
+    st.write("---")
+
+    st.code("""
+    # ... INSIDE THE DICTIONARY LOOP ...
+
+    # 1. Inject the dmsid directly into the SQL WHERE clause using an f-string
+    query = f'''
+    SELECT DISTINCT address_1 AS address, address_2 AS address2, city, state, zip, email_address AS email
+    FROM services
+    WHERE dv_dealer_id IN('{dmsid}')
+      AND email_opt_out = 'True'
+    '''
+
+    # 2. Pull the data from Snowflake
+    df = sfc(query)
+
+    # 3. Clean the individual dataframe
+    df.dropna(subset=['EMAIL'], inplace=True)
+    df = df.drop_duplicates(subset=['EMAIL'])
+
+    # 4. Construct the dynamic output path and save it!
+    # Result: C:\\...\\Scrub_Outputs\\LaFontaine-Mazda_Livonia_March_scrub.csv
+    output_file_path = os.path.join(output_folder_path, f"{project_title}_{month}_scrub.csv")
+    df.to_csv(output_file_path, index=False)
+
+    print(f"Successfully saved: {project_title}")
+    """, language="python")
+
+    if st.button("✅ I am officially a Local Architect"):
+        st.session_state['mod8_passed'] = True
+        st.session_state.completed.add(current_module)
+        st.balloons()
+        st.write("---")
+        st.markdown("<h1 style='text-align: center; color: #4fc3f7;'>🛠️ LOCAL BATCH SYSTEM ONLINE</h1>",
+                    unsafe_allow_html=True)
+        st.success("🎉 **PHASE 2 COMPLETE!** You have successfully rewired a local production script.")
+        st.info("You are now ready to step into the Cloud. Ask your instructor for the Phase 3 password!")
+# ==========================================
+# PHASE 3 LANDING PAGE
+# ==========================================
+elif current_module == "--- PHASE 3: CLOUD ARCHITECT ---":
+    st.title("☁️ Phase 3: The Cloud Architect")
+    st.subheader("Building Systems in the Cloud")
+
+    st.markdown("""
+    You conquered the local machine. You know how to prep text, loop through dictionaries, and track your outputs. 
+
+    Now, it is time to leave the `C:\` drive behind. 
+
+    In the real world, enterprise data doesn't live on your desktop. It lives in cloud databases like **Snowflake**, and the outputs need to be delivered to shared cloud drives like **SharePoint**. Cloud connections, APIs, and custom functions can be incredibly challenging to set up. That is why we are going to take the massive, 300-line `sp_lookbacks.py` script and rewire it to build a new Journey Suppression tool.
+
+    ### Your Curriculum:
+    * **Module 9: The SharePoint Blueprint** - Changing where a script looks for its input files on the cloud.
+    * **Module 10: The Time Machine** - Replacing hardcoded dates with dynamic, automated calendars.
+    * **Module 11: The SQL Surgeon** - Injecting Python variables directly into complex Snowflake queries.
+    * **Module 12: The Output Architect** - Generating dynamic filenames based on the 1st of the month.
+
+    🚨 **Note:** Phase 3 is locked to protect proprietary SQL logic! 
+    👈 **Click Module 9 in the sidebar and enter the Phase 3 password to unlock.**
+    """)
+
+# ==========================================
+# MODULE 9: THE SHAREPOINT BLUEPRINT
+# ==========================================
+elif current_module == "Module 9: The SharePoint Blueprint":
+    st.title("🏗️ The SharePoint Blueprint")
+    st.subheader("Phase 3 | Module 9: Rewiring Cloud Inputs")
+    st.markdown("""
+    In Phase 2, you pointed Python to a folder on your computer. In Phase 3, we are pointing Python to a SharePoint site. 
+
+    You are taking a massive production script (`sp_lookbacks.py`) and stripping it down. The first step is changing where it looks for instructions.
     """)
     st.write("---")
 
@@ -1288,36 +1477,36 @@ elif current_module == "Module 6: The Blueprint":
         st.write(
             "In Python, we use variables to store these paths so we only have to type them once. Here is what your new setup block should look like:")
         st.code("""
-# 1. Update the folder locations
+# 1. Update the SharePoint folder locations
 MAIN_FOLDER = 'Data Governance/Suppression/By Journey'
 TEMPLATE_FOLDER = f'{MAIN_FOLDER}/Templates'
 TEMPLATE_FILENAME = 'Journey_Suppression_Template.csv'
 
-# 2. Pretend we loaded the CSV. Now we extract just the 5 variables we need for this specific run:
+# 2. Pretend we loaded the CSV from the cloud. Now extract just the 5 variables we need:
 client_name = str(row.get('client_name', '')).strip()
 ohq = str(row.get('ohq', '')).strip()
 source_client_id = str(row.get('source_client_id', '')).strip()
 segment = str(row.get('segment', '')).strip()
         """, language="python")
 
-    st.info("Check off this module once you understand how to re-route folder paths in an existing script!")
-    if st.button("✅ I understand how to change inputs"):
-        st.session_state['mod6_passed'] = True
+    st.info("Check off this module once you understand how to re-route folder paths in an existing cloud script!")
+    if st.button("✅ I understand how to change Cloud inputs"):
+        st.session_state['mod9_passed'] = True
         st.session_state.completed.add(current_module)
-        st.balloons()  # <-- Celebration added!
-        st.success("🎉 Blueprint Secured! Great job.")
+        st.balloons()
+        st.success("🎉 Cloud Blueprint Secured! Great job.")
         next_module_button(current_module)
 
 # ==========================================
-# MODULE 7: THE TIME MACHINE
+# MODULE 10: THE TIME MACHINE
 # ==========================================
-elif current_module == "Module 7: The Time Machine":
+elif current_module == "Module 10: The Time Machine":
     st.title("⏳ The Time Machine")
-    st.subheader("Phase 2 | Module 7: Static vs. Dynamic Dates")
+    st.subheader("Phase 3 | Module 10: Static vs. Dynamic Dates")
     st.markdown("""
     If you hardcode dates into a script, you have to manually edit the code every single time you run it. We want Python to be smart enough to figure out the dates itself.
 
-    Our business rule: **We always want the data from the 1st of the current month up to today.**
+    Our business rule for this cloud tool: **We always want the data from the 1st of the current month up to today.**
     """)
     st.write("---")
 
@@ -1344,32 +1533,32 @@ today = date.today()
 # Tell Python: "Take today's date, but rewind the day to the 1st"
 start_of_month = today.replace(day=1)
 
-# Format them into strings so the SQL database can read them (YYYY-MM-DD)
+# Format them into strings so Snowflake can read them (YYYY-MM-DD)
 start_date = start_of_month.strftime('%Y-%m-%d')
 end_date = today.strftime('%Y-%m-%d')
 
-print(f"Running data from {start_date} to {end_date}")
+print(f"Running Snowflake data from {start_date} to {end_date}")
         """, language="python")
 
     st.info(
         "Dynamic dates are the secret to true automation. Once you master `strftime`, you never have to type a date manually again.")
     if st.button("✅ I've mastered time travel"):
-        st.session_state['mod7_passed'] = True
+        st.session_state['mod10_passed'] = True
         st.session_state.completed.add(current_module)
-        st.balloons()  # <-- Celebration added!
-        st.success("🎉 Time Machine activated! Next stop: SQL.")
+        st.balloons()
+        st.success("🎉 Time Machine activated! Next stop: Snowflake.")
         next_module_button(current_module)
 
 # ==========================================
-# MODULE 8: THE SQL SURGEON
+# MODULE 11: THE SQL SURGEON
 # ==========================================
-elif current_module == "Module 8: The SQL Surgeon":
+elif current_module == "Module 11: The SQL Surgeon":
     st.title("🩺 The SQL Surgeon")
-    st.subheader("Phase 2 | Module 8: Injecting Variables into Queries")
+    st.subheader("Phase 3 | Module 11: Injecting Variables into Queries")
     st.markdown("""
     The original `sp_lookbacks.py` script has a massive, 50-line SQL query with complex joins. Our new script doesn't need all that. 
 
-    We need to write a clean, simple query and **inject** the variables we created in Modules 6 and 7 directly into the SQL text.
+    We need to write a clean, simple query and **inject** the variables we created in Modules 9 and 10 directly into the SQL text before sending it to Snowflake.
     """)
     st.write("---")
 
@@ -1382,7 +1571,7 @@ elif current_module == "Module 8: The SQL Surgeon":
 sql_query = f'''
     SELECT 
         addressid,
-        full_address,
+        full_address,f
         segment,
         result_date
     FROM 
@@ -1398,22 +1587,21 @@ df_raw = sfc(sql_query)
     """, language="python")
 
     st.success(
-        "By doing it this way, the SQL query rebuilds itself perfectly for every single row in your SharePoint CSV template!")
+        "By doing it this way, the Snowflake query rebuilds itself perfectly for every single row in your SharePoint CSV template!")
     if st.button("✅ I understand SQL injection"):
-        st.session_state['mod8_passed'] = True
+        st.session_state['mod11_passed'] = True
         st.session_state.completed.add(current_module)
-        st.balloons()  # <-- Celebration added!
+        st.balloons()
         st.success("🎉 Surgery complete! The variables are in.")
         next_module_button(current_module)
-
 # ==========================================
-# MODULE 9: THE OUTPUT ARCHITECT
+# MODULE 12: THE OUTPUT ARCHITECT
 # ==========================================
-elif current_module == "Module 9: The Output Architect":
+elif current_module == "Module 12: The Output Architect":
     st.title("📦 The Output Architect")
-    st.subheader("Phase 2 | Module 9: Dynamic Filenames")
+    st.subheader("Phase 3 | Module 12: Dynamic Filenames")
     st.markdown("""
-    You've pulled the data. Now we need to save it exactly the way the business asked for it. 
+    You've pulled the data from Snowflake. Now we need to save it exactly the way the business asked for it and send it back to SharePoint. 
 
     The requirement is strict: Every output file must follow the exact naming convention: `ohq__generic__sales__{firstdayofthemonth}.csv`.
     """)
@@ -1421,7 +1609,7 @@ elif current_module == "Module 9: The Output Architect":
 
     st.markdown("### Constructing the Filename")
     st.write(
-        "We will use our dynamic date tool from Module 7 to figure out the 1st of the current month, format it as `yymmdd`, and use an f-string to piece it all together.")
+        "We will use our dynamic date tool from Module 10 to figure out the 1st of the current month, format it as `yymmdd`, and use an f-string to piece it all together.")
 
     st.code("""
 from datetime import date
@@ -1429,50 +1617,49 @@ from datetime import date
 # 1. Grab the 1st of the current month and format it as YYMMDD (e.g., 260301)
 first_day_of_month = date.today().replace(day=1).strftime('%y%m%d')
 
-# 2. Build the filename using the OHQ variable we grabbed in Module 6
+# 2. Build the filename using the OHQ variable we grabbed in Module 9
 # It will look like: 12345__generic__sales__260301.csv
 final_filename = f"{ohq}__generic__sales__{first_day_of_month}.csv"
 
-# 3. Save the dataframe to that file
+# 3. Save the dataframe to that file (which will then be uploaded to SharePoint)
 df_raw.to_csv(final_filename, index=False)
 
 print(f"Successfully saved: {final_filename}")
     """, language="python")
 
     st.info(
-        "Check this off to complete Phase 2. You now have all the puzzle pieces to strip down the Lookbacks script and build the new Journey Suppression script!")
+        "Check this off to complete Phase 3. You now have all the puzzle pieces to strip down the Lookbacks script and build the new Journey Suppression script in the cloud!")
 
-    if st.button("✅ I am officially a Script Architect", use_container_width=True):
-        st.session_state['mod9_passed'] = True
+    if st.button("✅ I am officially a Cloud Architect", use_container_width=True):
+        st.session_state['mod12_passed'] = True
         st.session_state.completed.add(current_module)
         st.balloons()
 
-        # THE BIG PHASE 2 PAYOFF REVEAL
+        # THE BIG PHASE 3 PAYOFF REVEAL
         st.write("---")
         st.markdown("""
-        <h1 style='text-align: center; color: #4fc3f7; font-size: 3em;'>🏗️ SYSTEM ONLINE 🏗️</h1>
-        <h3 style='text-align: center; color: #aaaaaa;'>You are officially a Data Architect.</h3>
+        <h1 style='text-align: center; color: #4fc3f7; font-size: 3em;'>☁️ CLOUD SYSTEM ONLINE ☁️</h1>
+        <h3 style='text-align: center; color: #aaaaaa;'>You are officially a Cloud Architect.</h3>
         <br>
         """, unsafe_allow_html=True)
 
         st.success(
-            "🎉 **PHASE 2 COMPLETE!** You have successfully learned how to dismantle a production script and rewire it into a brand new automation tool.")
+            "🎉 **PHASE 3 COMPLETE!** You have successfully learned how to dismantle a massive cloud production script and rewire it into a brand new automation tool.")
 
         # Displaying their new "Architect Stats"
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Folder Inputs", "Rewired 🔌")
+        col1.metric("SharePoint Inputs", "Rewired 🔌")
         col2.metric("Date Logic", "Automated ⏳")
-        col3.metric("SQL Queries", "Injected 💉")
-        col4.metric("File Outputs", "Dynamic 📦")
+        col3.metric("Snowflake SQL", "Injected 💉")
+        col4.metric("Cloud Outputs", "Dynamic 📦")
 
         st.write("---")
         st.markdown("""
         ### 🚀 Your Final Mission
-        You no longer just clean data. You build the systems that process it. 
+        You no longer just clean data. You build the enterprise systems that process it. 
 
         Your training is complete. Open up PyCharm, make a copy of the old `sp_lookbacks.py` script, and start building the real **Journey Suppression** tool for the business!
         """)
-
 # ==========================================
 # 📝 FEEDBACK
 # ==========================================
